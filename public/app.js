@@ -21,7 +21,7 @@ const sceneConfig = [
     {
         sceneNumber: 1,
         name: "Scene 1 - Duck Billed Platypus",
-        useOffset: true,
+        useOffset: false,
         modelPath: 'model/2 platypus.glb',
         audioPath: 'audio/S1_DBP.mp3',
         animations: ['swim']
@@ -30,15 +30,15 @@ const sceneConfig = [
         sceneNumber: 2,
         name: "Scene 2 - Biladurang",
         useOffset: false,
-        modelPath: 'models/1 platypus.glb',
+        modelPath: 'model/2 platypus.glb',
         audioPath: 'audio/S2_Biladurang.mp3',
         animations: ['idle']
     },
     {
         sceneNumber: 3,
         name: "Scene 3 - Shy",
-        useOffset: false,
-        modelPath: 'models/1 platypus.glb',
+        useOffset: true,
+        modelPath: 'model/2 platypus.glb',
         audioPath: 'audio/S3_Shy2.mp3',
         animations: ['idle']
     },
@@ -46,7 +46,7 @@ const sceneConfig = [
         sceneNumber: 4,
         name: "Scene 4 - Breathe",
         useOffset: false,
-        modelPath: 'models/1 platypus.glb',
+        modelPath: 'model/2 platypus.glb',
         audioPath: 'audio/S4_Breathe2.mp3',
         animations: ['swim']
     },
@@ -54,7 +54,7 @@ const sceneConfig = [
         sceneNumber: 5,
         name: "Scene 5 - Streamlined",
         useOffset: false,
-        modelPath: 'models/1 platypus.glb',
+        modelPath: 'model/2 platypus.glb',
         audioPath: 'audio/S5_Streamlined.mp3',
         animations: ['swim']
     }
