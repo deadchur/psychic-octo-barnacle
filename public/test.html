@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <meta name="description" content="Location-Based AR Experience" />
+        <meta name="apple-mobile-web-app-title" content="AR Experience" />
+        <meta charset="utf-8" />
+        <title>Location-Based AR</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/mainStyles.css">
+        <script src="https://cdn.jsdeliver.net/gh/aframevr/aframe/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.7/aframe/build/aframe-ar.min.js"></script>
+    </head>
+    <body>
+        <a href="index.html" class="back-button">Back</a>
+        <video id="camera-feed" autoplay playsinline muted></video>
+        <div id="canvas-container"></div>
+        <div id="arrow"></div>
+        <div id="alignment-indicator"></div>
+        <div id="status">Initializing AR...</div>
+        <div id="instruction"></div>
+        
+        <a-scene
+            vr-mode-ui="enabled: false"
+            arjs="sourceType: webcam; debugUIEnabled: false;"
+            renderer="logarithmicDepthBuffer: true; precision: low"
+            embedded
+            gesture-detector
+        >
+            <a-camera gps-camera rotation-reader look-controls-enabled="false"></a-camera>
+        </a-scene>
+
+        <script src="/app.js" defer></script>
+    </body>
+</html>
