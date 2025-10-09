@@ -22,13 +22,10 @@ const sceneConfig = [
         sceneNumber: 1,
         name: "Scene 1 - Duck Billed Platypus",
         useOffset: true,
-        modelPath: 'models/2 platypus.glb',
+        modelPath: 'model/2 platypus.glb',
         audioPath: 'audio/S1_DBP.mp3',
         animations: ['swim']
-    }
-    //
-    /**
-     * 
+    },
     {
         sceneNumber: 2,
         name: "Scene 2 - Biladurang",
@@ -61,7 +58,6 @@ const sceneConfig = [
         audioPath: 'audio/S5_Streamlined.mp3',
         animations: ['swim']
     }
-     */
 ];
 
 function getUserLocation() {
