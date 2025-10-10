@@ -22,12 +22,12 @@
         
         <a-scene
             vr-mode-ui="enabled: false"
-            arjs="sourceType: webcam; debugUIEnabled: false;"
-            renderer="logarithmicDepthBuffer: true; precision: low"
+            arjs="sourceType: webcam; sourceWidth: 1280, sourceHeight: 960, displayWidth: 1280, displayHeight: 960, debugUIEnabled: false;"
+            renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true;"
             embedded
             gesture-detector
         >
-            <a-camera gps-camera rotation-reader look-controls-enabled="false"></a-camera>
+            <a-camera gps-camera="minDistance: 0; maxDistance: 50;" rotation-reader look-controls-enabled="false"></a-camera>
         </a-scene>
 
         <script src="/app.js" defer></script>

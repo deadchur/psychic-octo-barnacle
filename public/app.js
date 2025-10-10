@@ -7,6 +7,10 @@ let sceneEntities = [];
 
 const GLOBAL_SCALE = '1 1 1';
 
+window.onload = () => {
+    let 
+}
+
 function applyOffset(lat, lng) {
     const offsetLat = 0.000293002735 / 2; // ~16.25m north
     const offsetLng = -0.00042281789233 / 2; // ~19m west
