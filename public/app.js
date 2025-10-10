@@ -84,7 +84,7 @@ function loadSharedModel() {
         const loader = new THREE.GLTFLoader();
 
         const dracoLoader = new THREE.DRACOLoader();
-        dracoLoader.setDecoderPath('/libs/draco/');
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
         dracoLoader.setDecoderConfig({ type: 'js' });
         loader.setDRACOLoader(dracoLoader);
 
