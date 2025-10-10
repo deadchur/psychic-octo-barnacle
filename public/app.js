@@ -83,11 +83,17 @@ function loadSharedModel() {
     return new Promise((resolve, reject) => {
         const loader = new THREE.GLTFLoader();
 
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+        dracoLoader.setDecoderConfig({ type: 'js' });
+        loader.setDRACOLoader(dracoLoader);
+
         loader.load(
             'model/platypus_LAND.glb',
             (gltf) => {
                 console.log('Model loaded');
                 sharedModel = gltf;
+                dracoLoader.dispose();
                 resolve(gltf);
             }, (error) => {
                 console.error('Model load error:', error);
