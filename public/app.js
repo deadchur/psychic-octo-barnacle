@@ -97,6 +97,7 @@ function loadSharedModel() {
                 resolve(gltf);
             }, (error) => {
                 console.error('Model load error:', error);
+                dracoLoader.dispose();
                 reject('Model load error: ' + error.message);
             }
         );
@@ -125,7 +126,7 @@ function createSceneEntity(config, lat, lng) {
         const modelClone = sharedModel.scene.clone();
 
         const modelEntity = document.createElement('a-entity');
-        modelEntity.setObject3D('mesh', modelClone);
+        modelEntity.object3D.add(modelClone);
         model.setAttribute('scale', GLOBAL_SCALE);
         model.setAttribute('rotation', '0 0 0');
         model.setAttribute('position', '0 0 0');
@@ -162,7 +163,15 @@ async function initScenes() {
         await getUserLocation();
 
         updateStatus('Loading 3D model...');
-        await loadSharedModel();
+
+        try {
+            await loadSharedModel();
+            console.log('Model loaded, creating scenes...');
+        } catch (modelError) {
+            console.error(modelError);
+            updateStatus('Error loading model: ' + modelError);
+            return;
+        }
 
         sceneConfig.forEach((config) => {
             let lat = userLocation.lat;
@@ -190,7 +199,7 @@ async function initScenes() {
             updateInstructions('Look around to find the platypus');
             experienceStarted = true;
             startScene(0);
-        }, 3000);
+        }, 2000);
     } catch (error) {
         console.error('Initialization error:', error);
         updateStatus('Error: ' + error.message);

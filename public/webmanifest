@@ -23,7 +23,7 @@
     "/": {
       "headers": {
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-        "Content-Security-Policy-Report-Only": "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdeliver.net https://aframe.io https://raw.githack.com; style-src 'self' https://fonts/googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none';"
+        "Content-Security-Policy-Report-Only": "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdeliver.net https://aframe.io https://raw.githack.com https://www.gstatic.com; style-src 'self' https://fonts/googleapis.com; worker-src 'self' https://www.gstatic.com; connect-src 'self' https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none';"
       }
     }
   }
