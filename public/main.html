@@ -2,24 +2,22 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>GeoAR.js demo</title>
-        <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-        <script src="https://raw.githack.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe-master.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
         <!-- https://rawcdn.githack.com/jeromeetienne/AR.js/024318c67121bd57045186b83b42f10c6560a34a/aframe/build/aframe-ar.js -->
     </head>
 
     <body>
         <a-scene
             vr-mode-ui="enabled: false"
-            arjs="sourceType: webcam; sourceWidth: 1280, sourceHeight: 960, displayWidth: 1280, displayHeight: 960, debugUIEnabled: false;"
+            arjs="sourceType: webcam; videoTexture: true; sourceWidth: 1280, sourceHeight: 960, displayWidth: 1280, displayHeight: 960, debugUIEnabled: false;"
             renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true;"
             embedded
-            gesture-detector
         >
-            <a-camera gps-camera="minDistance: 0; maxDistance: 50;" rotation-reader look-controls-enabled="false"></a-camera>
+            <a-camera gps-camera rotation-reader look-controls-enabled="false"></a-camera>
         </a-scene>
 
-        <script src="/app.js" defer></script>
+        <script src="/app.js"></script>
     </body>
 </html>

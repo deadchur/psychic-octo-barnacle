@@ -5,14 +5,7 @@ let experienceStarted = false;
 let currentScene = 0;
 let sceneEntities = [];
 
-const GLOBAL_SCALE = '1 1 1';
-
-/**
- * 
-window.onload = () => {
-    let 
-}
- */
+const GLOBAL_SCALE = '3 3 3';
 
 function applyOffset(lat, lng) {
     const offsetLat = 0.000293002735 / 2; // ~16.25m north
@@ -29,7 +22,7 @@ const sceneConfig = [
         sceneNumber: 1,
         name: "Scene 1 - Duck Billed Platypus",
         useOffset: false,
-        modelPath: 'model/2platypus.glb',
+        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S1_DBP.mp3',
         animations: ['swim']
     },
@@ -37,7 +30,7 @@ const sceneConfig = [
         sceneNumber: 2,
         name: "Scene 2 - Biladurang",
         useOffset: false,
-        modelPath: 'model/2platypus.glb',
+        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S2_Biladurang.mp3',
         animations: ['idle']
     },
@@ -45,7 +38,7 @@ const sceneConfig = [
         sceneNumber: 3,
         name: "Scene 3 - Shy",
         useOffset: true,
-        modelPath: 'model/2platypus.glb',
+        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S3_Shy2.mp3',
         animations: ['idle']
     },
@@ -53,7 +46,7 @@ const sceneConfig = [
         sceneNumber: 4,
         name: "Scene 4 - Breathe",
         useOffset: false,
-        modelPath: 'model/2platypus.glb',
+        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S4_Breathe2.mp3',
         animations: ['swim']
     },
@@ -61,7 +54,7 @@ const sceneConfig = [
         sceneNumber: 5,
         name: "Scene 5 - Streamlined",
         useOffset: false,
-        modelPath: 'model/2platypus.glb',
+        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S5_Streamlined.mp3',
         animations: ['swim']
     }
@@ -83,6 +76,7 @@ function getUserLocation() {
                 console.log('Location:', userLocation);
                 resolve(userLocation);
             }, (error) => {
+                console.error('Geolocation error:', error);
                 reject('Geolocation error: ' + error.message);
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -102,11 +96,29 @@ function createSceneEntity(config, lat, lng) {
     container.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lng};`);
     container.setAttribute('visible', 'false');
 
+    const testSphere = document.createElement('a-sphere');
+    testSphere.setAttribute('radius', '0.25');
+    testSphere.setAttribute('color', '#FF0000');
+    testSphere.setAttribute('position', '0 2 0');
+    container.appendChild(testSphere);
+
     const model = document.createElement('a-entity');
     model.setAttribute('gltf-model', config.modelPath);
     model.setAttribute('scale', GLOBAL_SCALE);
     model.setAttribute('rotation', '0 0 0');
-    model.setAttribute('animation-mixer', `clip: ${config.animation}`);
+    model.setAttribute('position', '0 0 0');
+
+    if (config.animations && config.animations.length > 0) {
+        model.setAttribute('animation-mixer', `clip: ${config.animations[0]}`);
+    }
+
+    model.addEventListener('model-loaded', () => {
+        console.log(`Model for scene ${config.sceneNumber} loaded`);
+    });
+
+    model.addEventListener('model-error', (e) => {
+        console.error(`Model load error for scene ${config.sceneNumber}:`, e);
+    });
 
     container.appendChild(model);
     scene.appendChild(container);
@@ -117,10 +129,15 @@ function createSceneEntity(config, lat, lng) {
         moveToNextScene();
     });
 
+    audio.addEventListener('error', (e) => {
+        console.error(`Audio load error for scene ${config.sceneNumber}:`, e);
+    });
+
     return {
         container: container,
         model: model,
         audio: audio,
+        testSphere: testSphere,
         config: config
     };
 }
