@@ -2,20 +2,24 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <title>GeoAR.js demo</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="CSS/mainStyles.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe-master.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
-        <!-- https://rawcdn.githack.com/jeromeetienne/AR.js/024318c67121bd57045186b83b42f10c6560a34a/aframe/build/aframe-ar.js -->
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     </head>
 
-    <body>
+    <body style="margin : 0px; overflow: hidden;">
         <a-scene
             vr-mode-ui="enabled: false"
+            embedded
             arjs="sourceType: webcam; videoTexture: true; sourceWidth: 1280, sourceHeight: 960, displayWidth: 1280, displayHeight: 960, debugUIEnabled: false;"
             renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true;"
-            embedded
         >
-            <a-camera gps-camera rotation-reader look-controls-enabled="false"></a-camera>
+            <a-camera gps-camera rotation-reader></a-camera>
         </a-scene>
 
         <script src="/app.js"></script>

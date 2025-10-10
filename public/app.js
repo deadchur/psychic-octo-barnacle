@@ -4,6 +4,7 @@ let isReady = false;
 let experienceStarted = false;
 let currentScene = 0;
 let sceneEntities = [];
+let sharedModel = null;
 
 const GLOBAL_SCALE = '3 3 3';
 
@@ -17,46 +18,40 @@ function applyOffset(lat, lng) {
 }
 
 const sceneConfig = [
-    // LOCATION 1
     {
         sceneNumber: 1,
         name: "Scene 1 - Duck Billed Platypus",
         useOffset: false,
-        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S1_DBP.mp3',
-        animations: ['swim']
+        animation: 'swim'
     },
     {
         sceneNumber: 2,
         name: "Scene 2 - Biladurang",
         useOffset: false,
-        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S2_Biladurang.mp3',
-        animations: ['idle']
+        animation: 'idle'
     },
     {
         sceneNumber: 3,
         name: "Scene 3 - Shy",
         useOffset: true,
-        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S3_Shy2.mp3',
-        animations: ['idle']
+        animation: 'idle'
     },
     {
         sceneNumber: 4,
         name: "Scene 4 - Breathe",
         useOffset: false,
-        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S4_Breathe2.mp3',
-        animations: ['swim']
+        animation: 'swim'
     },
     {
         sceneNumber: 5,
         name: "Scene 5 - Streamlined",
         useOffset: false,
-        modelPath: 'model/platypus.glb',
         audioPath: 'audio/S5_Streamlined.mp3',
-        animations: ['swim']
+        animation: 'swim'
     }
 ];
 
@@ -84,6 +79,24 @@ function getUserLocation() {
     });
 }
 
+function loadSharedModel() {
+    return new Promise((resolve, reject) => {
+        const loader = new THREE.GLTFLoader();
+
+        loader.load(
+            'model/platypus.glb',
+            (gltf) => {
+                console.log('Model loaded');
+                sharedModel = gltf;
+                resolve(gltf);
+            }, (error) => {
+                console.error('Model load error:', error);
+                reject('Model load error: ' + error.message);
+            }
+        );
+    });
+}
+
 function createSceneEntity(config, lat, lng) {
     const scene = document.querySelector('a-scene');
 
@@ -102,25 +115,21 @@ function createSceneEntity(config, lat, lng) {
     testSphere.setAttribute('position', '0 2 0');
     container.appendChild(testSphere);
 
-    const model = document.createElement('a-entity');
-    model.setAttribute('gltf-model', config.modelPath);
-    model.setAttribute('scale', GLOBAL_SCALE);
-    model.setAttribute('rotation', '0 0 0');
-    model.setAttribute('position', '0 0 0');
+    if (sharedModel) {
+        const modelClone = sharedModel.scene.clone();
 
-    if (config.animations && config.animations.length > 0) {
-        model.setAttribute('animation-mixer', `clip: ${config.animations[0]}`);
+        const modelEntity = document.createElement('a-entity');
+        model.setAttribute('scale', GLOBAL_SCALE);
+        model.setAttribute('rotation', '0 0 0');
+        model.setAttribute('position', '0 0 0');
+
+        if (config.animation) {
+            modelEntity.setAttribute('animation-mixer', `clip: ${config.animation}`);
+        }
+
+        container.appendChild(modelEntity);
     }
 
-    model.addEventListener('model-loaded', () => {
-        console.log(`Model for scene ${config.sceneNumber} loaded`);
-    });
-
-    model.addEventListener('model-error', (e) => {
-        console.error(`Model load error for scene ${config.sceneNumber}:`, e);
-    });
-
-    container.appendChild(model);
     scene.appendChild(container);
 
     const audio = new Audio(config.audioPath);
@@ -135,9 +144,7 @@ function createSceneEntity(config, lat, lng) {
 
     return {
         container: container,
-        model: model,
         audio: audio,
-        testSphere: testSphere,
         config: config
     };
 }
@@ -147,7 +154,10 @@ async function initScenes() {
         updateStatus('Getting user location...');
         await getUserLocation();
 
-        sceneConfig.forEach((config, index) => {
+        updateStatus('Loading 3D model...');
+        await loadSharedModel();
+
+        sceneConfig.forEach((config) => {
             let lat = userLocation.lat;
             let lng = userLocation.lng;
 
@@ -238,11 +248,17 @@ function updateInstructions(message) {
 }
 
 window.addEventListener('load', () => {
-    console.log('Page loaded, checking for AFRAME...');
+    console.log('Starting...');
 
     if (typeof AFRAME === 'undefined') {
         console.error('AFRAME not found');
         updateStatus('Error: AFRAME not found');
+        return;
+    }
+
+    if (typeof THREE === 'undefined') {
+        console.error('THREE.js not found');
+        updateStatus('Error: THREE.js not found');
         return;
     }
 
@@ -254,8 +270,12 @@ window.addEventListener('load', () => {
         return;
     }
 
-    scene.addEventListener('loaded', () => {
-        console.log('A-Frame scene loaded');
+    scene.addEventListener('camera-init', () => {
+        console.log('Camera initialized');
+    });
+
+    scene.addEventListener('gps-camera-update-position', (e) => {
+        console.log('GGPS position updated:', e.detail.position);
     });
 
     AFRAME.registerComponent('rotation-reader', {
@@ -264,5 +284,8 @@ window.addEventListener('load', () => {
         }
     });
 
-initScenes();
+    setTimeout(() => {
+        console.log('Initializing scene...');
+        initScenes();
+    }, 1000);
 });
