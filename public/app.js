@@ -79,6 +79,9 @@ function getUserLocation() {
     });
 }
 
+/**
+ * 
+ * @returns 
 function loadSharedModel() {
     return new Promise((resolve, reject) => {
         const loader = new THREE.GLTFLoader();
@@ -101,6 +104,32 @@ function loadSharedModel() {
                 reject('Model load error: ' + error.message);
             }
         );
+    });
+}
+ */
+
+function preloadModel() {
+    const assets = document.querySelector('a-assets') || document.createElement('a-assets');
+
+    if (!document.querySelector('a-assets')) {
+        document.querySelector('a-scene').appendChild(assets);
+    }
+
+    const modelAsset = document.createElement('a-asset-item');
+    modelAsset.setAttribute('id', 'platypus-model');
+    modelAsset.setAttribute('src', 'model/platypus_LAND.glb');
+    assets.appendChild(modelAsset);
+
+    return new Promise((resolve) => {
+        modelAsset.addEventListener('loaded', () => {
+            console.log('Model preloaded');
+            resolve();
+        });
+
+        setTimeout(() => {
+            console.warn('Model preload timeout, proceeding anyway');
+            resolve();
+        }, 15000);
     });
 }
 
@@ -163,7 +192,10 @@ async function initScenes() {
         await getUserLocation();
 
         updateStatus('Loading 3D model...');
+        await preloadModel();
 
+        /**
+         * 
         try {
             await loadSharedModel();
             console.log('Model loaded, creating scenes...');
@@ -172,6 +204,7 @@ async function initScenes() {
             updateStatus('Error loading model: ' + modelError);
             return;
         }
+         */
 
         sceneConfig.forEach((config) => {
             let lat = userLocation.lat;
@@ -272,12 +305,6 @@ window.addEventListener('load', () => {
         return;
     }
 
-    if (typeof THREE === 'undefined') {
-        console.error('THREE.js not found');
-        updateStatus('Error: THREE.js not found');
-        return;
-    }
-
     const scene = document.querySelector('a-scene');
 
     if (!scene) {
@@ -285,14 +312,6 @@ window.addEventListener('load', () => {
         updateStatus('Error: Scene not found');
         return;
     }
-
-    scene.addEventListener('camera-init', () => {
-        console.log('Camera initialized');
-    });
-
-    scene.addEventListener('gps-camera-update-position', (e) => {
-        console.log('GGPS position updated:', e.detail.position);
-    });
 
     AFRAME.registerComponent('rotation-reader', {
         tick: function () {
