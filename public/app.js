@@ -7,9 +7,12 @@ let sceneEntities = [];
 
 const GLOBAL_SCALE = '1 1 1';
 
+/**
+ * 
 window.onload = () => {
     let 
 }
+ */
 
 function applyOffset(lat, lng) {
     const offsetLat = 0.000293002735 / 2; // ~16.25m north
@@ -26,7 +29,7 @@ const sceneConfig = [
         sceneNumber: 1,
         name: "Scene 1 - Duck Billed Platypus",
         useOffset: false,
-        modelPath: 'model/2 platypus.glb',
+        modelPath: 'model/2platypus.glb',
         audioPath: 'audio/S1_DBP.mp3',
         animations: ['swim']
     },
@@ -34,7 +37,7 @@ const sceneConfig = [
         sceneNumber: 2,
         name: "Scene 2 - Biladurang",
         useOffset: false,
-        modelPath: 'model/2 platypus.glb',
+        modelPath: 'model/2platypus.glb',
         audioPath: 'audio/S2_Biladurang.mp3',
         animations: ['idle']
     },
@@ -42,7 +45,7 @@ const sceneConfig = [
         sceneNumber: 3,
         name: "Scene 3 - Shy",
         useOffset: true,
-        modelPath: 'model/2 platypus.glb',
+        modelPath: 'model/2platypus.glb',
         audioPath: 'audio/S3_Shy2.mp3',
         animations: ['idle']
     },
@@ -50,7 +53,7 @@ const sceneConfig = [
         sceneNumber: 4,
         name: "Scene 4 - Breathe",
         useOffset: false,
-        modelPath: 'model/2 platypus.glb',
+        modelPath: 'model/2platypus.glb',
         audioPath: 'audio/S4_Breathe2.mp3',
         animations: ['swim']
     },
@@ -58,7 +61,7 @@ const sceneConfig = [
         sceneNumber: 5,
         name: "Scene 5 - Streamlined",
         useOffset: false,
-        modelPath: 'model/2 platypus.glb',
+        modelPath: 'model/2platypus.glb',
         audioPath: 'audio/S5_Streamlined.mp3',
         animations: ['swim']
     }
