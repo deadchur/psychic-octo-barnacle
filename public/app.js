@@ -84,7 +84,7 @@ function loadSharedModel() {
         const loader = new THREE.GLTFLoader();
 
         loader.load(
-            'model/platypus.glb',
+            'model/platypus_LAND.glb',
             (gltf) => {
                 console.log('Model loaded');
                 sharedModel = gltf;
@@ -119,6 +119,7 @@ function createSceneEntity(config, lat, lng) {
         const modelClone = sharedModel.scene.clone();
 
         const modelEntity = document.createElement('a-entity');
+        modelEntity.setObject3D('mesh', modelClone);
         model.setAttribute('scale', GLOBAL_SCALE);
         model.setAttribute('rotation', '0 0 0');
         model.setAttribute('position', '0 0 0');
