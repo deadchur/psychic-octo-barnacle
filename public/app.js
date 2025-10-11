@@ -157,8 +157,8 @@ function createSceneEntity(config, lat, lng) {
         const modelEntity = document.createElement('a-entity');
         modelEntity.object3D.add(modelClone);
         model.setAttribute('scale', GLOBAL_SCALE);
-        model.setAttribute('rotation', '0 0 0');
-        model.setAttribute('position', '0 0 0');
+        model.setAttribute('position', '0 2 1');
+        //model.setAttribute('rotation', '0 0 0');
 
         if (config.animation) {
             modelEntity.setAttribute('animation-mixer', `clip: ${config.animation}`);
