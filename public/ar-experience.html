@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <meta name="description" content="Wonga Wetlands PlatARpus" />
+        <meta name="apple-mobile-web-app-title" content="Wonga Wetlands AR" />
+        <meta charset="utf-8" />
+        <title>Wonga Wetlands PlatARpus</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="ar-experience-style.css">
+
+        <!-- <script src='./sceneInformation.js' type="module"></script> -->
+
+        <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+        <!-- <script src="js/aframe.min.js"></script>
+        <script src="js/aframe-ar.js"></script>  -->
+        <!--
+        commenting out to test aframes built in three.js
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.min.js"></script> -->
+
+        <!-- <link rel="icon" type="image/png" href="/public/flavicon.ico/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/public/flavicon.ico/favicon.svg" />
+        <link rel="shortcut icon" href="/public/flavicon.ico/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/public/flavicon.ico/apple-touch-icon.png" />
+        <link rel="manifest" href="/public/flavicon.ico/site.webmanifest" /> -->
+    </head>
+    <body>
+        <!-- <a href="index.html" class="back-button"> Back </a> -->
+
+        <!-- <video id="camera-feed" autoplay playsinline muted style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 1;    
+        "></video> -->
+
+        <!--
+            <audio test autoplay>
+                <source src="audio/test_narration.mp3" type="audio/mp3">
+            </audio>
+        -->
+
+        <script src="ar-experience-script.js"></script>
+
+        <div>
+            <a-scene embedded>
+                <a-marker type="pattern" url="resources/data/kanji.patt" id="marker0" size="0.1" registerevents></a-marker>
+                <!-- <a-marker type="barcode" value="00" id="marker0" size="0.1" registerevents>
+                    <a-box position="0 0.5 0" color="#4CC3D9"></a-box>
+                </a-marker> -->
+
+                    <!-- <a-marker type="pattern" url="resources/data/kanji.patt">
+                        <a-box position="0 0.5 0" 
+                            material="color: red; transparent: true; opacity: 0.50;">
+                        </a-box>
+                    </a-marker> -->
+                
+                <a-marker type="pattern" url="resources/data/alpha.patt" id="marker1" registerevents></a-marker>
+                <a-entity run></a-entity>
+                <a-entity camera loadcamera></a-entity>
+            </a-scene>
+        </div>
+
+        <div id="canvas-container"></div>
+        <div id="welcome-div">
+            <div id="welcome-header-div">
+                <img src="resources/images/AlburyCity_Trans.png" alt="Albury City Council" class="logo">
+                <h1>PlatARpus</h1>
+            </div>
+            <div id="welcome-content-div">
+                <p>Welcome to the PlatARpus experience!</p>
+                <p>Point your camera towards one of the PlatARpus markers visible nearby to play the experience.</p>
+            </div>
+            <div id="start-button-div">
+                <button type="button" id="start-button" disabled="true" onclick="startFunction()">Now Loading...</button>
+            </div>
+        </div>
+        <div id="subtitle-div">
+            <p id="subtitle-container" style="color:black;">Default text</p>
+        </div>
+        <div id="debug-div">
+            <p id="model-coords">More default text</p>
+            <p id="elapsed-time">More</p>
+            <p id="active-animation">Temp</p>
+        </div>
+
+        <!-- <div class="content-container">
+            <button type="button" id="start-button" disabled="true" onclick="startFunction()">Now Loading...</button>
+
+            <div class="instruction-text">
+                Please press the START button to continue to the Augmented Reality Experience
+            </div>
+        </div> -->
+    </body>
+</html>

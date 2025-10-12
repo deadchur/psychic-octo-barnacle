@@ -99,37 +99,6 @@
             max-width: 250px;
         }
 
-        .decoration {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-        }
-
-        .decoration:nth-child(1) {
-            top: 20%;
-            right: 20%;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .decoration:nth-child(2) {
-            top: 60%;
-            right: 15%;
-            animation: float 4s ease-in-out infinite reverse;
-        }
-
-        .decoration:nth-child(3) {
-            top: 30%;
-            right: 35%;
-            animation: float 5s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); opacity: 0.2; }
-            50% { transform: translateY(-10px); opacity: 0.5; }
-        }
-
         /* Mobile Optimization */
         @media (max-width: 480px) {
             .settings-icon {
