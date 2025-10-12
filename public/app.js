@@ -7,6 +7,7 @@ let sceneEntities = [];
 let sharedModel = null;
 
 const GLOBAL_SCALE = '3 3 3';
+const MODEL_PATH = 'model/platypus_LAND.glb';
 
 function applyOffset(lat, lng) {
     const offsetLat = 0.000293002735 / 2; // ~16.25m north
@@ -109,6 +110,9 @@ function loadSharedModel() {
  */
 
 function preloadModel() {
+
+    return new Promise.resolve();
+
     const assets = document.querySelector('a-assets') || document.createElement('a-assets');
 
     if (!document.querySelector('a-assets')) {
@@ -136,11 +140,6 @@ function preloadModel() {
 function createSceneEntity(config, lat, lng) {
     const scene = document.querySelector('a-scene');
 
-    if (!scene) {
-        console.error('A-Scene not found');
-        return null;
-    }
-
     const container = document.createElement('a-entity');
     container.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lng};`);
     container.setAttribute('visible', 'false');
@@ -152,21 +151,29 @@ function createSceneEntity(config, lat, lng) {
     container.appendChild(testSphere);
 
     if (sharedModel) {
-        const modelClone = sharedModel.scene.clone();
+        //const modelClone = sharedModel.scene.clone();
 
         const modelEntity = document.createElement('a-entity');
-        modelEntity.object3D.add(modelClone);
-        model.setAttribute('scale', GLOBAL_SCALE);
-        model.setAttribute('position', '0 2 1');
+        //modelEntity.object3D.add(modelClone);
+        modelEntity.setAttribute('gltf-model', MODEL_PATH);
+        modelEntity.setAttribute('scale', GLOBAL_SCALE);
+        modelEntity.setAttribute('position', '0 2 1');
         //model.setAttribute('rotation', '0 0 0');
+
+        modelEntity.addEventListener('model-loaded', () => {
+            console.log(`Model loaded for scene ${config.sceneNumber}`);
+        });
+
+        modelEntity.addEventListener('model-error', (e) => {
+            console.error(`Model load error for scene ${config.sceneNumber}:`, e);
+        });
 
         if (config.animation) {
             modelEntity.setAttribute('animation-mixer', `clip: ${config.animation}`);
         }
-
-        container.appendChild(modelEntity);
     }
-
+    
+    container.appendChild(modelEntity);
     scene.appendChild(container);
 
     const audio = new Audio(config.audioPath);
@@ -181,6 +188,7 @@ function createSceneEntity(config, lat, lng) {
 
     return {
         container: container,
+        model: modelEntity,
         audio: audio,
         config: config
     };
