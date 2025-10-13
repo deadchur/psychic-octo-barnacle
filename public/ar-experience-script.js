@@ -42,7 +42,7 @@ const C_ORIGIN = 0;
 const C_LINEAR = 1;
 const C_QUADRATIC = 2;
 
-const audioPath = "resources/audio/";
+const audioPath = "audio/";
 const audioFileName = "NarrationAudio.mp3";
 const sceneInformation = {
     "Scene1": {
@@ -308,7 +308,7 @@ function loadARObjects() {
 
     arObjectsConfig.forEach((config, index) => {
         loader.load(
-            'resources/models/platypus.glb',
+            'model/platypus.glb',
             (gltf) => {
                 const model = gltf.scene;
                 model.position.set(0, 10000, 50);
