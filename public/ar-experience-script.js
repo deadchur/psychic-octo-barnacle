@@ -202,7 +202,7 @@ async function initCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: 'environment',
+                facingMode: { exact: 'environment' },
                 width: { ideal: 1920, min: 1280 },
                 height: { ideal: 1080, min: 720 },
                 frameRate: { ideal: 120, min: 30 }
@@ -211,6 +211,7 @@ async function initCamera() {
         });
 
         const video = document.getElementById('camera-feed');
+
         if (video) {
             video.srcObject = stream;
             video.autoplay = true;
@@ -222,6 +223,20 @@ async function initCamera() {
                     video.play().then(resolve).catch(console.error);
                 };
             });
+        }
+
+        const arScene = document.querySelector('a-scene').systems["arjs"];
+
+        if (!arScene.hasLoaded) {
+            await new Promise((resolve) => arScene.addEventListener('loaded', resolve, { once: true }));
+        }
+
+        const arSystem = arScene.systems["arjs"];
+
+        if (arSystem && arSystem.arSource) {
+            arSystem.arSource.domElement.srcObject = video.srcObject;
+            arSystem.arSource.ready = true;
+            console.log('camera stream injected into AR.js');
         }
 
         // isCameraReady = true;
