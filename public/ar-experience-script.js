@@ -225,15 +225,15 @@ async function initCamera() {
             });
         }
 
-        const arScene = document.querySelector('a-scene').systems["arjs"];
+        const arScene = document.querySelector('a-scene');
 
         if (!arScene.hasLoaded) {
             await new Promise((resolve) => arScene.addEventListener('loaded', resolve, { once: true }));
         }
 
-        const arSystem = arScene.systems["arjs"];
+        const arSystem = arScene.systems.arjs;
 
-        if (arSystem && arSystem.arSource) {
+        if (arSystem && arSystem.arSource && stream) {
             arSystem.arSource.domElement.srcObject = video.srcObject;
             arSystem.arSource.ready = true;
             console.log('camera stream injected into AR.js');
