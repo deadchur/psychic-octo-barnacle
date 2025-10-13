@@ -34,7 +34,8 @@ const launchFlags = {
     "Model": false,
     "Audio": false,
     "Paths": false,
-    "Camera": true
+    "Camera": false,
+    "Three": false,
 }
 
 const C_ORIGIN = 0;
@@ -47,21 +48,11 @@ const sceneInformation = {
     "Scene1": {
         "AudioStart": 0,
         "AudioEnd": 17,
-        // "Curves": [
-        //     [C_ORIGIN, [[0, 0, 40]]],
-        //     [C_LINEAR, [[10, 0, 40]]],
-        //     [C_LINEAR, [[10, 0, 30]]],
-        //     [C_LINEAR, [[0, 0, 30]]],
-        //     [C_LINEAR, [[0, 0, 40]]],
-        //     [C_LINEAR, [[10, 0, 30]]],
-        //     [C_LINEAR, [[10, 0, 40]]],
-        //     [C_LINEAR, [[0, 0, 30]]]
-        // ],
         "Curves": [
-            [C_ORIGIN, [[20, -20, 220]]],
-            [C_LINEAR, [[20, -20, 100]]],
-            [C_QUADRATIC, [[-20, -20, 100], [0, -20, 30]]],
-            [C_LINEAR, [[-20, -20, 220]]]
+            [C_ORIGIN, [[20, -15, 220]]],
+            [C_LINEAR, [[20, -15, 100]]],
+            [C_QUADRATIC, [[-20, -15, 100], [0, -15, 30]]],
+            [C_LINEAR, [[-20, -15, 220]]]
         ],
         "Subtitles": [
             [0.2, 3, "This is a duck-billed platypus."],
@@ -71,11 +62,7 @@ const sceneInformation = {
             [13.5, 17, "especially as they are mainly active at night."]
         ],
         "Animations": [
-            [0, 2],
-            [2, 6],
-            [4, 2],
-            [6, 6],
-            [8, 2],
+            [0, 6],
             [99999999, 0]
         ],
         "CurveDuration": 17,
@@ -84,34 +71,30 @@ const sceneInformation = {
     "Scene2": {
         "AudioStart": 18,
         "AudioEnd": 38,
-        // "Curves": [
-        //     [   C_ORIGIN, [ [-3.0, 0.0, 0.0] ]],
-        //     [   C_LINEAR, [ [-1.0, 1.0, -1.0] ]],
-        //     [   C_LINEAR, [ [-4.0, -3.0, 2.0] ]],
-        //     [   C_LINEAR, [ [3.0, 0.0, -0.0] ]]
-        // ],
         "Curves": [
-            [C_ORIGIN, [[100, -20, 160]]],
-            [C_QUADRATIC, [[50, -20, 160], [75, -20, 200]]],
-            [C_QUADRATIC, [[0, -20, 160], [25, -20, 120]]],
-            [C_LINEAR, [[-100, -20, 160]]]
+            [C_ORIGIN, [[20, -15, 220]]],
+            [C_QUADRATIC, [[20, -15, 155], [15, -15, 187.5]]],
+            [C_QUADRATIC, [[20, -15, 100], [25, -15, 122.5]]],
+            [C_QUADRATIC, [[-20, -15, 100], [0, -15, 50]]],
+            [C_QUADRATIC, [[20, -15, 100], [0, -15, 150]]],
+            [C_QUADRATIC, [[-20, -15, 100], [0, -15, 50]]],
+            [C_QUADRATIC, [[-20, -15, 155], [-25, -15, 122.5]]],
+            // [C_QUADRATIC, [[-20, -15, 155], [-15, -15, 187.5]]],
+            [C_LINEAR, [[-20, -15, 220]]]
         ],
         "Subtitles": [
             [18.2, 21.5, "Platypus breathe air through the little nostrils on their bill"],
             [21.5, 25.5, "and can stay underwater for several minutes at a time."],
-            [25.5, 29, "Their streamlined bodies and waterproof, insulated fur"],
-            [29, 31, "have evolved for swimming under the water."],
+            [25.5, 29.5, "Their streamlined bodies and waterproof, insulated fur"],
+            [29.5, 31, "have evolved for swimming under the water."],
             [31, 35, "Their strong front feet pull them along"],
             [35, 38, "while their back feet and tail act as rudders."]
         ],
         "Animations": [
-            [0, 2],
-            [1, 6],
-            [2, 3],
-            [3, 7]
+            [0, 6],
             [99999999, 0]
         ],
-        "CurveDuration": 8,
+        "CurveDuration": 20,
         "SceneDuration": 20
     }
 }
@@ -186,11 +169,10 @@ AFRAME.registerComponent('run', {
             // console.log(this.p0);
             markerPositions[0] = this.p0;
             currentSceneName = "Scene1";
-
             activePath = 0;
         }
         else if (markerInformation[this.m1.id]["Visible"]) {
-            this.m0.object3D.getWorldPosition(this.p1);
+            this.m1.object3D.getWorldPosition(this.p1);
             // console.log(this.p0);
             markerPositions[1] = this.p1;
             currentSceneName = "Scene2";
@@ -208,7 +190,11 @@ function changeScene(sceneId) {
         // activePath = 0;
         animTimer = 0;
         elapsedTime = 0;
-        document.getElementById("subtitle-div").style.visibility = "visible";
+        currentAnimation = -1;
+
+        if (document.getElementById("subtitle-choice").checked) {
+            document.getElementById("subtitle-div").style.visibility = "visible";
+        }
     }
 }
 
@@ -217,9 +203,9 @@ async function initCamera() {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: 'environment',
-                // width: { ideal: 1920, min: 1280 },
-                // height: { ideal: 1080, min: 720 },
-                // frameRate: { ideal: 120, min: 30 }
+                width: { ideal: 1920, min: 1280 },
+                height: { ideal: 1080, min: 720 },
+                frameRate: { ideal: 120, min: 30 }
             },
             audio: false
         });
@@ -311,6 +297,8 @@ function initThreeJS() {
     scene.add(modelLight);
 
     console.log('Three.js initialized');
+
+    launchFlags["Three"] = true;
 }
 
 function loadARObjects() {
@@ -341,7 +329,6 @@ function loadARObjects() {
                         action.setLoop(THREE.LoopRepeat)
                         pathwayAnimations.push(action);
                     }
-                    // const action = mixer.clipAction();
                 }
 
                 if (gltf.animations && gltf.animations.length > 0) {
@@ -397,6 +384,7 @@ function onWindowResize() {
 }
 
 let previousPos = new THREE.Vector3(0, 0, 0);
+
 function animate() {
     const deltaTime = clock.getDelta();
 
@@ -408,58 +396,38 @@ function animate() {
             const model = arObjects[0];
             
             if (launchFlags["Paths"]) {
-                // if (activePath < 0) {
-                //     activePath = 0;
-                // }
-
-                // if (activePath < curveCount) {
-                if (activePath < 10000000) {
-                    let nextPos;
-                    if (animTimer < 1) {
-                        // console.log(pathways, activePath, animTimer);
-                        nextPos = pathways[activePath].getPoint(animTimer);
-                        // previousPos = nextPos;
-                    }
-                    else {
-                        nextPos = new THREE.Vector3(model.position.x, model.position.y, model.position.z);
-                    }
-                    // const nextPos = new THREE.Vector3(0, 0, 0);
-                    const movDir = new THREE.Vector3(
-                        nextPos.x - previousPos.x,
-                        nextPos.y - previousPos.y,
-                        nextPos.z - previousPos.z
-                    );
-                    if (animTimer < 1) {
-                        previousPos = nextPos;
-                    }
-                    // const movDir = 
-                    movDir.normalize();
-                    let rotAngel = Math.atan2(movDir.x, movDir.z);
-                    model.rotation.y = rotAngel;
-                    // console.log(markerPositions[0]);
-                    // console.log(model.rotation.y, movDir, rotAngel);
-                    // console.log(nextPos, previousPos, animTimer)
-
-                    if (animTimer < curScene["CurveDuration"]) {
-                        model.position.set(
-                            previousPos.x*3+markerPositions[0].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
-                            previousPos.y*3+markerPositions[0].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
-                            previousPos.z*3-modelDistance
-                        );
-                        // model.position.set(
-                        //     nextPos.x, nextPos.y, nextPos.z
-                        // )
-                    }
-                    else {
-
-                    }
-
-                    document.getElementById("elapsed-time").textContent = nextPos.x + " " + nextPos.y + " " + nextPos.z;
-                    document.getElementById("elapsed-time").textContent = model.position.x + " " + model.position.y + " " + model.position.z;
-                    
-                    animTimer += deltaTime / curScene["CurveDuration"];
+                let nextPos;
+                if (animTimer < 1) {
+                    // console.log(pathways, activePath, animTimer);
+                    nextPos = pathways[activePath].getPoint(animTimer);
+                    // previousPos = nextPos;
                 }
+                else {
+                    nextPos = new THREE.Vector3(model.position.x, model.position.y, model.position.z);
+                }
+                // const nextPos = new THREE.Vector3(0, 0, 0);
+                const movDir = new THREE.Vector3(
+                    nextPos.x - previousPos.x,
+                    nextPos.y - previousPos.y,
+                    nextPos.z - previousPos.z
+                );
+                if (animTimer < 1) {
+                    previousPos = nextPos;
+                }
+                // const movDir = 
+                movDir.normalize();
+                let rotAngel = Math.atan2(movDir.x, movDir.z);
+                model.rotation.y = rotAngel;
 
+                if (animTimer < curScene["CurveDuration"]) {
+                    model.position.set(
+                        previousPos.x*3+markerPositions[activePath].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
+                        previousPos.y*3+markerPositions[activePath].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
+                        previousPos.z*3-modelDistance
+                    );
+                }
+                
+                animTimer += deltaTime / curScene["CurveDuration"];
             }
         }
 
@@ -472,14 +440,6 @@ function animate() {
                     pathwayAnimations[curScene["Animations"][currentAnimation][1]].stop();
                 }
                 currentAnimation += 1;
-                
-                if (currentAnimation > 0) {
-                    // pathwayAnimations[animationInformation[currentAnimation][1]].crossFadeFrom(pathwayAnimations[animationInformation[currentAnimation-1][1]], 0.2, false);
-                    // pathwayAnimations[sceneInformation[currentSceneName]["Animations"][currentAnimation-1][1]].fadeOut(1);
-                    // pathwayAnimations[sceneInformation[currentSceneName]["Animations"][currentAnimation][1]].fadeIn(1);
-                }
-
-                document.getElementById("active-animation").textContent = curScene["Animations"][currentAnimation][1];
             }
         }
 
@@ -491,6 +451,7 @@ function animate() {
             currentSceneName = "";
             arObjects[0].position.y = 1000;
             document.getElementById("subtitle-div").style.visibility = "hidden";
+            lastMarker = -1;
         }
 
         // console.log(elapsedTime);
@@ -565,6 +526,7 @@ function startFunction() {
 
     experienceStarted = true;
 
+    // activePath = 1;
     // changeScene("Scene2");
 }
 
@@ -580,6 +542,16 @@ async function init() {
     loadARObjects();
     loadModelAudio();
     generatePaths();
+
+    const checkbox = document.getElementById("subtitle-choice");
+    checkbox.addEventListener("change", () => {
+        if (!checkbox.checked) {
+            document.getElementById("subtitle-div").style.visibility = "hidden";
+        }
+        else if (currentSceneName != "") {
+            document.getElementById("subtitle-div").style.visibility = "visible";
+        }
+    });
 
     window.addEventListener('resize', onWindowResize);
 }
