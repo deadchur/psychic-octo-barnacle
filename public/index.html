@@ -57,13 +57,13 @@
         <div>
             <a-scene 
                 embedded
-                arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-                vr-mode-ui="enabled: false"
-                renderer="logarithmicDepthBuffer: true; precision: medium;"
-                run>
+                arjs="sourceType: webcam; debugUIEnabled: false;"
+                vr-mode-ui="enabled: false">
 
                 <a-marker type="pattern" url="/resources/data/kanji.patt" id="marker0" size="0.1" registerevents></a-marker>
                 <a-marker type="pattern" url="/resources/data/alpha.patt" id="marker1" registerevents></a-marker>
+                <a-entity run></a-entity>
+                <a-entity camera></a-entity>
 
             </a-scene>
         </div>

@@ -199,7 +199,7 @@ function changeScene(sceneId) {
 }
 
 
-async function initCamera() {
+async function waitForARSystem() {
     try {
         const arScene = document.querySelector('a-scene');
 
@@ -209,21 +209,12 @@ async function initCamera() {
             });
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const arSystem = arScene.systems.arjs;
-        
-        if (arSystem && arSystem.arSource) {
-            console.log('AR.js camera system ready');
-            launchFlags["Camera"] = true;
-            return true;
-        } else {
-            throw new Error('AR.js system not found');
-        }
+        console.log('AR.js scene loaded');
+        launchFlags["Camera"] = true;
+        return true;
 
     } catch (error) {
-        console.error('Camera failed to initialize:', error);
-        alert('AR system failed to initialize. Please refresh and allow camera permissions.');
+        console.error('AR system failed:', error);
         return false;
     }
 }
@@ -525,8 +516,8 @@ function startFunction() {
 async function init() {
     console.log('Initializing AR experience...');
 
-    const cameraSuccess = await initCamera();
-    if (!cameraSuccess) {
+    const arReady = await waitForARSystem();
+    if (!arReady) {
         console.error('Camera initalization failed');
         return;
     }
