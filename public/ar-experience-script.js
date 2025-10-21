@@ -200,28 +200,48 @@ function changeScene(sceneId) {
 
 async function initCamera() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: { exact: 'environment' },
-                width: { ideal: 1920, min: 1280 },
-                height: { ideal: 1080, min: 720 },
-                frameRate: { ideal: 120, min: 30 }
-            },
-            audio: false
-        });
+        let stream;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    frameRate: { ideal: 60 }
+                },
+                audio: false
+            });
+        } catch (firstError) {
+            console.warn('Failed with ideal constraints, trying basic constraints:', firstError);
+            
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment'
+                },
+                audio: false
+            });
+        }
 
         const video = document.getElementById('camera-feed');
 
         if (video) {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+
             video.srcObject = stream;
             video.autoplay = true;
             video.playsinline = true;
             video.muted = true;
 
-            await new Promise((resolve) => {
+            await new Promise((resolve, reject) => {
                 video.onloadedmetadata = () => {
-                    video.play().then(resolve).catch(console.error);
+                    video.play()
+                        .then(resolve)
+                        .catch(reject);
                 };
+                
+                setTimeout(() => reject(new Error('Video load timeout')), 10000);
             });
         }
 
@@ -236,17 +256,24 @@ async function initCamera() {
         if (arSystem && arSystem.arSource && stream) {
             arSystem.arSource.domElement.srcObject = video.srcObject;
             arSystem.arSource.ready = true;
-            console.log('camera stream injected into AR.js');
+            console.log('Camera stream injected into AR.js');
         }
 
-        // isCameraReady = true;
         console.log('Camera ready');
         launchFlags["Camera"] = true;
-        // checkReadyToStart();
         return true;
 
     } catch (error) {
         console.error('Camera failed to initialize:', error);
+        
+        // Provide user-friendly error message
+        const errorMessage = error.name === 'NotReadableError' 
+            ? 'Camera is in use by another application. Please close other apps using the camera and refresh.'
+            : error.name === 'NotAllowedError'
+            ? 'Camera access denied. Please allow camera permissions and refresh.'
+            : `Camera error: ${error.message}`;
+            
+        alert(errorMessage);
         return false;
     }
 }
