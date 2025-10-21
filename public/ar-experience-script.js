@@ -198,106 +198,9 @@ function changeScene(sceneId) {
     }
 }
 
+
 async function initCamera() {
     try {
-        // First, enumerate all video devices to avoid depth/ToF cameras
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        
-        console.log('Available video devices:', videoDevices);
-        
-        // Try to find the main rear camera (avoid depth/ToF cameras)
-        // Depth cameras are usually very low resolution (0.3MP)
-        let targetDeviceId = null;
-        for (const device of videoDevices) {
-            const label = device.label.toLowerCase();
-            // Skip depth, ToF, or very specific camera types
-            if (!label.includes('depth') && 
-                !label.includes('tof') && 
-                !label.includes('time') &&
-                !label.includes('0.3')) {
-                if (label.includes('back') || label.includes('rear') || label.includes('environment')) {
-                    targetDeviceId = device.deviceId;
-                    console.log('Selected camera:', device.label);
-                    break;
-                }
-            }
-        }
-        
-        let stream;
-        const constraints = {
-            video: targetDeviceId ? {
-                deviceId: { exact: targetDeviceId },
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            } : {
-                facingMode: 'environment',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            },
-            audio: false
-        };
-        
-        try {
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-        } catch (firstError) {
-            console.warn('Failed with primary constraints, trying fallback:', firstError);
-            
-            for (const device of videoDevices) {
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        video: { 
-                            deviceId: { exact: device.deviceId },
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        },
-                        audio: false
-                    });
-                    console.log('Successfully using camera:', device.label);
-                    break;
-                } catch (e) {
-                    console.warn(`Camera ${device.label} failed:`, e.message);
-                    continue;
-                }
-            }
-            
-            if (!stream) {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: false
-                });
-            }
-        }
-
-        const video = document.getElementById('camera-feed');
-
-        if (video) {
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
-            }
-
-            video.srcObject = stream;
-            video.setAttribute('autoplay', '');
-            video.setAttribute('playsinline', '');
-            video.setAttribute('muted', '');
-            video.autoplay = true;
-            video.playsinline = true;
-            video.muted = true;
-
-            await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('Video load timeout'));
-                }, 10000);
-                
-                video.onloadedmetadata = () => {
-                    clearTimeout(timeout);
-                    video.play()
-                        .then(resolve)
-                        .catch(reject);
-                };
-            });
-        }
-
         const arScene = document.querySelector('a-scene');
 
         if (!arScene.hasLoaded) {
@@ -306,30 +209,21 @@ async function initCamera() {
             });
         }
 
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const arSystem = arScene.systems.arjs;
-
-        if (arSystem && arSystem.arSource && stream) {
-            arSystem.arSource.domElement.srcObject = video.srcObject;
-            arSystem.arSource.ready = true;
-            console.log('Camera stream injected into AR.js');
+        
+        if (arSystem && arSystem.arSource) {
+            console.log('AR.js camera system ready');
+            launchFlags["Camera"] = true;
+            return true;
+        } else {
+            throw new Error('AR.js system not found');
         }
-
-        console.log('Camera ready');
-        launchFlags["Camera"] = true;
-        return true;
 
     } catch (error) {
         console.error('Camera failed to initialize:', error);
-        
-        const errorMessage = error.name === 'NotReadableError' 
-            ? 'Camera hardware error. Please:\n1. Close other apps using the camera\n2. Restart your browser\n3. Try a different browser (Firefox/Opera)\n4. Check if another camera works'
-            : error.name === 'NotAllowedError'
-            ? 'Camera access denied. Please allow camera permissions and refresh.'
-            : error.name === 'NotFoundError'
-            ? 'No camera found on this device.'
-            : `Camera error: ${error.message}`;
-            
-        alert(errorMessage);
+        alert('AR system failed to initialize. Please refresh and allow camera permissions.');
         return false;
     }
 }
