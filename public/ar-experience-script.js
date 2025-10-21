@@ -417,12 +417,20 @@ function animate() {
         if (animationMixer_2) {
             animationMixer_2.update(deltaTime);
 
-            if (elapsedTime > curScene["Animations"][currentAnimation + 1][0]) {
-                pathwayAnimations[curScene["Animations"][currentAnimation+1][1]].play();
-                if (currentAnimation > -1) {
-                    pathwayAnimations[curScene["Animations"][currentAnimation][1]].stop();
+            const nextAnim = curScene["Animations"][currentAnimation + 1];
+            if (nextAnim && pathwayAnimations[nextAnim[1]]) {
+                if (elapsedTime > nextAnim[0]) {
+                    pathwayAnimations[nextAnim[1]].play();
+
+                    if (currentAnimation > -1) {
+                        const curAnim = curScene["Animations"][currentAnimation];
+                        if (curAnim && pathwayAnimations[curAnim[1]]) {
+                            pathwayAnimations[curAnim[1]].stop();
+                        }
+                    }
+
+                    currentAnimation += 1;
                 }
-                currentAnimation += 1;
             }
         }
 
