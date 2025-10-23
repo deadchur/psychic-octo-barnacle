@@ -18,14 +18,14 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 20;
+let modelDistance = 50;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
 const arObjectsConfig = [
     {
         name: "swim",
-        scale: { x: 5, y: 5, z: 5},
+        scale: { x: 8, y: 8, z: 8},
     }
 ];
 
@@ -227,8 +227,8 @@ function initThreeJS() {
     camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
-        0.1,
-        500
+        1,
+        1000
     );
 
     console.log(camera);
@@ -304,7 +304,7 @@ function loadARObjects() {
                 model.position.set(0, 10000, 50);
 
                 // config.scale ||
-                const modelScale = { x:5, y:5, z:5 };
+                const modelScale = { x:config.scale.x, y: config.scale.y, z: config.scale.z };
 
                 model.scale.set(modelScale.x, modelScale.y, modelScale.z);
 
@@ -463,7 +463,7 @@ function animate() {
 
         if (elapsedTime > curScene["SceneDuration"]) {
             currentSceneName = "";
-            arObjects[0].position.y = 1000;
+            arObjects[0].position.y = 10000;
             document.getElementById("subtitle-div").style.visibility = "hidden";
             lastMarker = -1;
         }
