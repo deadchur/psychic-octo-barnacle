@@ -18,7 +18,7 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 50;
+let modelDistance = 20;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
@@ -227,8 +227,8 @@ function initThreeJS() {
     camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
-        1,
-        1000
+        0.1,
+        500
     );
 
     console.log(camera);
@@ -405,7 +405,7 @@ function animate() {
                 if (animTimer < 1) {
                     previousPos = nextPos;
                 }
-                // const movDir = 
+
                 movDir.normalize();
                 let rotAngel = Math.atan2(movDir.x, movDir.z);
                 model.rotation.y = rotAngel;
@@ -423,12 +423,11 @@ function animate() {
 
                 if (animTimer < curScene["CurveDuration"]) {
                     const markerPos = markerPositions[activePath];
-                    const pathPos = previousPos;
 
                     model.position.set(
-                        markerPos.x + pathPos.x * 0.8,
-                        markerPos.y + pathPos.y * 0.8 - 5,
-                        markerPos.z + pathPos.z * 0.8 - modelDistance
+                        markerPos.x + previousPos.x * 0.8,
+                        markerPos.y + previousPos.y * 0.8 - 5,
+                        markerPos.z + previousPos.z * 0.8 - modelDistance
                     )
                 }
                 
@@ -450,7 +449,7 @@ function animate() {
                 }
 
                 if (pathwayAnimations[nextAnimIndex]) {
-                    pathwayAnimations[nextAnimIndex].rest().play();
+                    pathwayAnimations[nextAnimIndex].reset().play();
                     console.log("Playing animation:", nextAnimIndex);
                 }
 
