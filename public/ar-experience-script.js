@@ -260,6 +260,8 @@ function initThreeJS() {
 
     audioLoader = new THREE.AudioLoader();
 
+    /**
+     * 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
@@ -278,6 +280,7 @@ function initThreeJS() {
     const modelLight = new THREE.PointLight(0xffffff, 0.8, 100);
     modelLight.position.set(0, 5, 0);
     scene.add(modelLight);
+     */
 
     console.log('Three.js initialized');
 
@@ -291,7 +294,7 @@ function loadARObjects() {
 
     arObjectsConfig.forEach((config, index) => {
         loader.load(
-            'model/platypus.glb',
+            'model/final.glb',
             (gltf) => {
                 const model = gltf.scene;
                 model.position.set(0, 10000, 50);
