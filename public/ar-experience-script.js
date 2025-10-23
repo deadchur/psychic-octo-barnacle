@@ -18,13 +18,13 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 20;
+let modelDistance = 50;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
 const arObjectsConfig = [
     {
-        name: "Platypus Swimming",
+        name: "swim",
         scale: { x: 5, y: 5, z: 5},
     }
 ];
@@ -227,8 +227,8 @@ function initThreeJS() {
     camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
-        0.1,
-        500
+        1,
+        1000
     );
 
     console.log(camera);
@@ -260,7 +260,7 @@ function initThreeJS() {
 
     audioLoader = new THREE.AudioLoader();
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -271,12 +271,12 @@ function initThreeJS() {
     dirLight2.position.set(0, 0, -30);
     scene.add(dirLight2);
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
     fillLight.position.set(-2, -5, -2);
     scene.add(fillLight);
 
-    const modelLight = new THREE.PointLight(0xffffff, 0.5, 20);
-    modelLight.position.set(0, 2, 0);
+    const modelLight = new THREE.PointLight(0xffffff, 0.8, 100);
+    modelLight.position.set(0, 5, 0);
     scene.add(modelLight);
 
     console.log('Three.js initialized');
@@ -307,6 +307,7 @@ function loadARObjects() {
                 if (gltf.animations && gltf.animations.length > 0) {
                     const mixer = new THREE.AnimationMixer(model);
                     animationMixer_2 = mixer;
+
                     for (let i = 0; i < gltf.animations.length; i++) {
                         const action = mixer.clipAction(gltf.animations[i]);
                         action.setLoop(THREE.LoopRepeat)
@@ -418,9 +419,9 @@ function animate() {
                     const pathPos = previousPos;
 
                     model.position.set(
-                        markerPos.x + pathPos.x * 0.5,
-                        markerPos.y + pathPos.y * 0.5,
-                        markerPos.z + pathPos.z * 0.5 - modelDistance
+                        markerPos.x + pathPos.x * 0.8,
+                        markerPos.y + pathPos.y * 0.8 - 5,
+                        markerPos.z + pathPos.z * 0.8 - modelDistance
                     )
                 }
                 
@@ -431,20 +432,22 @@ function animate() {
         if (animationMixer_2) {
             animationMixer_2.update(deltaTime);
 
-            const nextAnim = curScene["Animations"][currentAnimation + 1];
-            if (nextAnim && pathwayAnimations[nextAnim[1]]) {
-                if (elapsedTime > nextAnim[0]) {
-                    pathwayAnimations[nextAnim[1]].play();
+            if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 1][0]) {
+                const nextAnimIndex = curScene["Animations"][currentAnimation + 1][1];
 
-                    if (currentAnimation > -1) {
-                        const curAnim = curScene["Animations"][currentAnimation];
-                        if (curAnim && pathwayAnimations[curAnim[1]]) {
-                            pathwayAnimations[curAnim[1]].stop();
-                        }
+                if (currentAnimation >= 0) {
+                    const curAnimIndex = curScene["Animations"][currentAnimation][1];
+                    if (pathwayAnimations[curAnimIndex]) {
+                        pathwayAnimations[curAnimIndex].stop();
                     }
-
-                    currentAnimation += 1;
                 }
+
+                if (pathwayAnimations[nextAnimIndex]) {
+                    pathwayAnimations[nextAnimIndex].rest().play();
+                    console.log("Playing animation:", nextAnimIndex);
+                }
+
+                currentAnimation += 1;
             }
         }
 

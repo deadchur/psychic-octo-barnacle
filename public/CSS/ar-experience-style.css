@@ -40,18 +40,13 @@ html, body {
     z-index:3;
     left:10%;
     right:10%;
-
-    /* border: solid red 2px; */
-    background-color:#c5e9f2;
-    border: solid #8bd3e6 2px;
-    border-radius: 1em;
-    font-family:'Roboto Bold';
-    visibility: hidden;
 }
 
 #subtitle-container {
     color: black;
     padding: 0.5em;
+    text-align: center;
+    font-size: 20px;
 }
 
 #welcome-header-div {
