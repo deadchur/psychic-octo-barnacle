@@ -292,6 +292,10 @@ function loadARObjects() {
 
     const loader = new THREE.GLTFLoader();
 
+    const dracoLoader = new THREE.DRACOLoader();
+    dracoLoader.setDecoderPath('/lib/');
+    loader.setDRACOLoader(dracoLoader);
+
     arObjectsConfig.forEach((config, index) => {
         loader.load(
             'model/final.glb',
