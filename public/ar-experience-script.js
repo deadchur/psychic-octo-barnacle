@@ -18,7 +18,7 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 80;
+let modelDistance = 20;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
@@ -297,7 +297,7 @@ function loadARObjects() {
                 model.position.set(0, 10000, 50);
 
                 // config.scale ||
-                const modelScale = { x:1, y:1, z:1 };
+                const modelScale = { x:5, y:5, z:5 };
 
                 model.scale.set(modelScale.x, modelScale.y, modelScale.z);
 
@@ -402,12 +402,26 @@ function animate() {
                 let rotAngel = Math.atan2(movDir.x, movDir.z);
                 model.rotation.y = rotAngel;
 
+                /**
+                 * 
                 if (animTimer < curScene["CurveDuration"]) {
                     model.position.set(
                         previousPos.x*3+markerPositions[activePath].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
                         previousPos.y*3+markerPositions[activePath].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
                         previousPos.z*3-modelDistance
                     );
+                }
+                 */
+
+                if (animTimer < curScene["CurveDuration"]) {
+                    const markerPos = markerPositions[activePath];
+                    const pathPos = previousPos;
+
+                    model.position.set(
+                        markerPos.x + pathPos.x * 0.5,
+                        markerPos.y + pathPos.y * 0.5,
+                        markerPos.z + pathPos.z * 0.5 - modelDistance
+                    )
                 }
                 
                 animTimer += deltaTime / curScene["CurveDuration"];

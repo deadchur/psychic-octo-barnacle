@@ -46,19 +46,15 @@
                 <p><br>Please press the START button to continue to the Augmented Reality experience.</p>
             </div>
         </div>
+        
         <div id="subtitle-div">
             <p id="subtitle-container" style="color:black;">Default text</p>
         </div>
-        <!-- <div id="debug-div">
-            <p id="model-coords">More default text</p>
-            <p id="elapsed-time">More</p>
-            <p id="active-animation">Temp</p>
-        </div> -->
-        
+
         <div>
             <a-scene 
                 embedded
-                arjs="sourceType: webcam; debugUIEnabled: false;"
+                arjs="sourceType: webcam; debugUIEnabled: false; sourceWidth: auto; sourceHeight: auto; displayWidth: auto; displayHeight: auto;"
                 vr-mode-ui="enabled: false">
 
                 <a-marker type="pattern" url="/resources/kanji.patt" id="marker0" size="0.1" registerevents></a-marker>
