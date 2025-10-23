@@ -25,7 +25,7 @@ let windowSize = [window.innerWidth, window.innerHeight];
 const arObjectsConfig = [
     {
         name: "Platypus Swimming",
-        scale: { x: 1, y: 1, z: 1},
+        scale: { x: 5, y: 5, z: 5},
     }
 ];
 
