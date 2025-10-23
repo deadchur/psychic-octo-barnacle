@@ -18,7 +18,8 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 50;
+let modelDistance = 20;
+let modelScale = 8;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
@@ -294,6 +295,7 @@ function loadARObjects() {
 
     const dracoLoader = new THREE.DRACOLoader();
     dracoLoader.setDecoderPath('/lib/');
+    dracoLoader.setDecoderConfig({ type: 'js' });
     loader.setDRACOLoader(dracoLoader);
 
     arObjectsConfig.forEach((config, index) => {
@@ -304,8 +306,7 @@ function loadARObjects() {
                 model.position.set(0, 10000, 50);
 
                 // config.scale ||
-                const modelScale = { x:config.scale.x, y: config.scale.y, z: config.scale.z };
-
+                const modelScale = config.scale;
                 model.scale.set(modelScale.x, modelScale.y, modelScale.z);
 
                 scene.add(model);
@@ -389,19 +390,18 @@ function animate() {
             if (launchFlags["Paths"]) {
                 let nextPos;
                 if (animTimer < 1) {
-                    // console.log(pathways, activePath, animTimer);
                     nextPos = pathways[activePath].getPoint(animTimer);
-                    // previousPos = nextPos;
                 }
                 else {
                     nextPos = new THREE.Vector3(model.position.x, model.position.y, model.position.z);
                 }
-                // const nextPos = new THREE.Vector3(0, 0, 0);
+
                 const movDir = new THREE.Vector3(
                     nextPos.x - previousPos.x,
                     nextPos.y - previousPos.y,
                     nextPos.z - previousPos.z
                 );
+
                 if (animTimer < 1) {
                     previousPos = nextPos;
                 }
@@ -425,9 +425,9 @@ function animate() {
                     const markerPos = markerPositions[activePath];
 
                     model.position.set(
-                        markerPos.x + previousPos.x * 0.8,
-                        markerPos.y + previousPos.y * 0.8 - 5,
-                        markerPos.z + previousPos.z * 0.8 - modelDistance
+                        markerPos.x + previousPos.x * 0.3,
+                        markerPos.y + previousPos.y * 0.3,
+                        markerPos.z + previousPos.z * 0.3 - modelDistance
                     )
                 }
                 
