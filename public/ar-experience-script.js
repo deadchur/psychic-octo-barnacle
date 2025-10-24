@@ -224,8 +224,8 @@ function initThreeJS() {
     camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
-        1,
-        1000
+        0.1,
+        500
     );
 
     console.log(camera);
