@@ -18,15 +18,15 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 10;
-let modelScale = 5;
+let modelDistance = 2;
+let modelScale = 15;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
 const arObjectsConfig = [
     {
         name: "swim",
-        scale: { x: 5, y: 5, z: 5},
+        scale: { x: 15, y: 15, z: 15},
     }
 ];
 
@@ -224,8 +224,8 @@ function initThreeJS() {
     camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
-        0.1,
-        500
+        1,
+        1000
     );
 
     console.log(camera);
@@ -424,9 +424,9 @@ function animate() {
                     const markerPos = markerPositions[activePath];
 
                     model.position.set(
-                        previousPos.x*3+markerPositions[activePath].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
-                        previousPos.y*3+markerPositions[activePath].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
-                        previousPos.z*3-modelDistance
+                        markerPos.x + previousPos.x * 0.2,
+                        markerPos.y + previousPos.y * 0.2,
+                        markerPos.z + previousPos.z * 0.2 - modelDistance
                     )
                 }
                 
