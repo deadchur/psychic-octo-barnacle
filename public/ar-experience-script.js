@@ -18,15 +18,15 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 20;
-let modelScale = 8;
+let modelDistance = 10;
+let modelScale = 5;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
 const arObjectsConfig = [
     {
         name: "swim",
-        scale: { x: 8, y: 8, z: 8},
+        scale: { x: 5, y: 5, z: 5},
     }
 ];
 
@@ -80,7 +80,6 @@ const sceneInformation = {
             [C_QUADRATIC, [[20, -15, 100], [0, -15, 150]]],
             [C_QUADRATIC, [[-20, -15, 100], [0, -15, 50]]],
             [C_QUADRATIC, [[-20, -15, 155], [-25, -15, 122.5]]],
-            // [C_QUADRATIC, [[-20, -15, 155], [-15, -15, 187.5]]],
             [C_LINEAR, [[-20, -15, 220]]]
         ],
         "Subtitles": [
@@ -105,7 +104,6 @@ const sceneInformation = {
 let markerVisible = { marker0: false, marker1: false };
 let markerSceneMap = { marker0: "Scene1", marker1: "Scene2"};
 
-// let lastMarkerMap = { marker0: 0, marker1: 1};
 let markerPositions = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];
 
 let markerInformation = {
@@ -164,7 +162,6 @@ AFRAME.registerComponent('run', {
             return;
         }
 
-        // if (markerVisible["marker0"]) {
         if (markerInformation[this.m0.id]["Visible"]) {
             this.m0.object3D.getWorldPosition(this.p0);
             // console.log(this.p0);
@@ -188,7 +185,6 @@ function changeScene(sceneId) {
         audioPlayer.currentTime = sceneInformation[sceneId]["AudioStart"];
         audioPlayer.play();
         currentSceneName = sceneId;
-        // activePath = 0;
         animTimer = 0;
         elapsedTime = 0;
         currentAnimation = -1;
@@ -417,6 +413,9 @@ function animate() {
                         previousPos.x*3+markerPositions[activePath].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
                         previousPos.y*3+markerPositions[activePath].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
                         previousPos.z*3-modelDistance
+                                                markerPos.x + previousPos.x * 0.3,
+                        markerPos.y + previousPos.y * 0.3,
+                        markerPos.z + previousPos.z * 0.3 - modelDistance
                     );
                 }
                  */
@@ -425,9 +424,9 @@ function animate() {
                     const markerPos = markerPositions[activePath];
 
                     model.position.set(
-                        markerPos.x + previousPos.x * 0.3,
-                        markerPos.y + previousPos.y * 0.3,
-                        markerPos.z + previousPos.z * 0.3 - modelDistance
+                        previousPos.x*3+markerPositions[activePath].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
+                        previousPos.y*3+markerPositions[activePath].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
+                        previousPos.z*3-modelDistance
                     )
                 }
                 
