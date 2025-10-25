@@ -207,6 +207,18 @@ async function waitForARSystem() {
         }
 
         console.log('AR.js scene loaded');
+
+        const arSource = window.THREEx?.ArToolkitSource?.instance;
+        if (arSource && arSource.parameters) {
+            arSource.parameters.sourceWidth = 1920;
+            arSource.parameters.sourceHeight = 1080;
+            arSource.parameters.displayWidth = 1920;
+            arSource.parameters.displayHeight = 1080;
+            console.log('[info] JS override 1080p video source');
+        } else {
+            console.warn('[warning] ARToolkitSource instance not ready - cannot set resolution');
+        }
+
         launchFlags["Camera"] = true;
         return true;
 
