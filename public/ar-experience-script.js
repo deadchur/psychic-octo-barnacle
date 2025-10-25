@@ -138,20 +138,20 @@ AFRAME.registerComponent('registerevents', {
         
         marker.addEventListener('markerFound', function() {
             markerInformation[marker.id]["Visible"] = true;
-            console.log(marker.id, " found");
-            console.log(markerInformation[marker.id]["Index"], " ", lastMarker);
+            //console.log(marker.id, " found");
+            //console.log(markerInformation[marker.id]["Index"], " ", lastMarker);
 
             let sceneChange = (markerInformation[marker.id]["Index"] != lastMarker);
             lastMarker = markerInformation[marker.id]["Index"];
             if (sceneChange) {
-                console.log("[info] Scene changed");
+                console.log("[info] Changed to scene ", markerInformation[marker.id]["Index"]);
                 changeScene(markerInformation[marker.id]["Scene"]);
             }
         });
 
         marker.addEventListener('markerLost', function() {
             markerInformation[marker.id]["Visible"] = false;
-            console.log(marker.id, " lost");
+            //console.log(marker.id, " lost");
         });
     }
 });
@@ -509,11 +509,11 @@ function animate() {
         if (animationMixer_2) {
             animationMixer_2.update(deltaTime);
 
-            if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 2][0]) {
-                const nextAnimIndex = curScene["Animations"][currentAnimation + 2][1];
+            if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 1][0]) {
+                const nextAnimIndex = curScene["Animations"][currentAnimation + 1][2];
 
                 if (currentAnimation >= 0) {
-                    const curAnimIndex = curScene["Animations"][currentAnimation][1];
+                    const curAnimIndex = curScene["Animations"][currentAnimation][2];
                     if (pathwayAnimations[curAnimIndex]) {
                         pathwayAnimations[curAnimIndex].stop();
                     }
