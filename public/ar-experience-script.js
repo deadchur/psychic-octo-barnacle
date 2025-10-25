@@ -22,6 +22,30 @@ let modelScale = 5;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
+// store visibility data in object;
+//  can only draw line when both are visible.
+let markerVisible = { marker0: false, marker1: false };
+let markerSceneMap = { marker0: "Scene1", marker1: "Scene2"};
+
+let markerPositions = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];
+
+let markerInformation = {
+    marker0: {
+        "Visible": false,
+        "Scene": "Scene1",
+        "Index": 0,
+        "Position": new THREE.Vector3(0, 0, 0)
+    },
+    marker1: {
+        "Visible": false,
+        "Scene": "Scene2",
+        "Index": 1,
+        "Position": new THREE.Vector3(0, 0, 0)
+    }
+}
+
+let lastMarker = -1;
+
 const arObjectsConfig = [
     {
         name: "swim",
@@ -119,7 +143,7 @@ class AnimationController {
         animations.forEach(clip => {
             const action = mixer.clipAction(clip);
             action.setLoop(THREE.LoopRepeat);
-            this.actionMap.set(clipname, action);
+            this.actionMap.set(clip.name, action);
         });
 
         console.log('AnimationController initialized with animations:',
@@ -204,30 +228,6 @@ class AnimationController {
     }
 
 }
-
-// store visibility data in object;
-//  can only draw line when both are visible.
-let markerVisible = { marker0: false, marker1: false };
-let markerSceneMap = { marker0: "Scene1", marker1: "Scene2"};
-
-let markerPositions = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];
-
-let markerInformation = {
-    marker0: {
-        "Visible": false,
-        "Scene": "Scene1",
-        "Index": 0,
-        "Position": new THREE.Vector3(0, 0, 0)
-    },
-    marker1: {
-        "Visible": false,
-        "Scene": "Scene2",
-        "Index": 1,
-        "Position": new THREE.Vector3(0, 0, 0)
-    }
-}
-
-let lastMarker = -1;
 
 /**
  * A-Frame component that registers marker visibility events
