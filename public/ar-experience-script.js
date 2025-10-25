@@ -283,7 +283,6 @@ function initThreeJS() {
 
     camera.position.set(0, 0, 0);
     camera.lookAt(0, 0, 30);
-    console.log('[info] Camera position:', camera.position);
 
     renderer = new THREE.WebGLRenderer({
         alpha: true,
@@ -389,7 +388,7 @@ function loadARObjects() {
                 }
 
                 launchFlags["Model"] = true;
-                console.log("<Finished loading: Model>");
+                console.log("[info] Finished loading: Model");
                 attemptUnlock();
             },
         );
@@ -409,13 +408,12 @@ function loadModelAudio() {
     function subtitleChange(event) {
         document.getElementById("subtitle-container").textContent = event.target.text;
     }
-    //console.log("Loading audio:", audioFileName);
     audioPlayer = new Audio("audio/NarrationAudio.mp3");
 
     // Load the subtitles
     const track = audioPlayer.addTextTrack("subtitles");
     for (const [curveName, curveInfo] of Object.entries(sceneInformation)) {
-        console.log("Loading subtitles");
+        console.log("[info] Loading subtitles");
         for (let i = 0; i < curveInfo["Subtitles"].length; i++) {
             const cue = new VTTCue(...curveInfo["Subtitles"][i]);
             cue.onenter = subtitleChange;
@@ -426,7 +424,7 @@ function loadModelAudio() {
     }
 
     launchFlags["Audio"] = true;
-    console.log("<Finished loading: Audio>");
+    console.log("[info] Finished loading: Audio");
     attemptUnlock();
 }
 
