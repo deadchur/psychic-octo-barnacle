@@ -18,15 +18,15 @@ let currentAnimation = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 2;
-let modelScale = 15;
+let modelDistance = 6;
+let modelScale = 5;
 
 let windowSize = [window.innerWidth, window.innerHeight];
 
 const arObjectsConfig = [
     {
         name: "swim",
-        scale: { x: 15, y: 15, z: 15},
+        scale: { x: 5, y: 5, z: 5},
     }
 ];
 
@@ -43,8 +43,6 @@ const C_ORIGIN = 0;
 const C_LINEAR = 1;
 const C_QUADRATIC = 2;
 
-const audioPath = "audio/";
-const audioFileName = "NarrationAudio.mp3";
 const sceneInformation = {
     "Scene1": {
         "AudioStart": 0,
@@ -123,6 +121,16 @@ let markerInformation = {
 
 let lastMarker = -1;
 
+/**
+ * A-Frame component that registers marker visibility events
+ * Listens for markerFound and markerLost events to track AR marker state
+ * Triggers changeScene() when a new marker is detected
+ * 
+ * May need further testing as updating lastMarker after the if statement 
+ * does not update correctly
+ * 
+ * @component registerevents
+ */
 AFRAME.registerComponent('registerevents', {
     init: function () 
     {
@@ -132,12 +140,11 @@ AFRAME.registerComponent('registerevents', {
             markerInformation[marker.id]["Visible"] = true;
             console.log(marker.id, " found");
             console.log(markerInformation[marker.id]["Index"], " ", lastMarker);
-            // Needs to be done this way for some reason
-            // Updating lastMarker after the if statement meant it didn't get updated
+
             let sceneChange = (markerInformation[marker.id]["Index"] != lastMarker);
             lastMarker = markerInformation[marker.id]["Index"];
             if (sceneChange) {
-                console.log("Scene change!");
+                console.log("[info] Scene changed");
                 changeScene(markerInformation[marker.id]["Scene"]);
             }
         });
@@ -149,6 +156,12 @@ AFRAME.registerComponent('registerevents', {
     }
 });
 
+/**
+ * A-Frame component that runs on every frame to track marker positions
+ * Updates the 3D position of detected markers and sets the active scene
+ * 
+ * @component run
+ */
 AFRAME.registerComponent('run', {
     init: function() {
         this.m0 = document.querySelector("#marker0");
@@ -157,6 +170,13 @@ AFRAME.registerComponent('run', {
         this.p1 = new THREE.Vector3();
     },
     
+    /**
+     * Called every frame to update the marker positions
+     * 
+     * @param {*} time - Total elapsed time since scene start
+     * @param {*} deltaTime - Time since last frame in milliseconds
+     * @returns - Exit condition if model is not ready
+     */
     tick: function(time, deltaTime) {
         if (!launchFlags["Model"]) {
             return;
@@ -164,14 +184,12 @@ AFRAME.registerComponent('run', {
 
         if (markerInformation[this.m0.id]["Visible"]) {
             this.m0.object3D.getWorldPosition(this.p0);
-            // console.log(this.p0);
             markerPositions[0] = this.p0;
             currentSceneName = "Scene1";
             activePath = 0;
         }
         else if (markerInformation[this.m1.id]["Visible"]) {
             this.m1.object3D.getWorldPosition(this.p1);
-            // console.log(this.p0);
             markerPositions[1] = this.p1;
             currentSceneName = "Scene2";
             activePath = 1;
@@ -179,6 +197,13 @@ AFRAME.registerComponent('run', {
     }
 })
 
+/**
+ * Function is called when a marker is found
+ * Changes scene, resets audio and animation state
+ * Only triggers if experience has already started
+ * 
+ * @param {*} sceneId - ID of the scene to switch to "Scene1" or "Scene2"
+ */
 function changeScene(sceneId) {
     if (experienceStarted) {
         audioPlayer.pause();
@@ -195,7 +220,18 @@ function changeScene(sceneId) {
     }
 }
 
-
+/**
+ * Waits for the A-Frame AR.js scene to initialize before continuing.
+ * Ensures that the THREE.ArToolkitSource instance is ready, then
+ * overrides the video source resolution from 640x480 (480p) to 1920x1080 (1080p).
+ * 
+ * The reason for this is that AR.js defaults to a low-res video source
+ * to improve performance on mobile devices, but this results in poor
+ * tracking quality and a blurry AR experience on desktop devices.
+ * 
+ * @async
+ * @returns {Promise<boolean>} true when initialization is successful, otherwise false
+ */
 async function waitForARSystem() {
     try {
         const arScene = document.querySelector('a-scene');
@@ -206,8 +242,8 @@ async function waitForARSystem() {
             });
         }
 
-        console.log('AR.js scene loaded');
-
+        /**
+         * 
         const arSource = window.THREEx?.ArToolkitSource?.instance;
         if (arSource && arSource.parameters) {
             arSource.parameters.sourceWidth = 1920;
@@ -218,33 +254,36 @@ async function waitForARSystem() {
         } else {
             console.warn('[warning] ARToolkitSource instance not ready - cannot set resolution');
         }
+         */
 
         launchFlags["Camera"] = true;
         return true;
 
     } catch (error) {
-        console.error('AR system failed:', error);
+        console.error('[error] AR system failed:', error);
         return false;
     }
 }
 
+/**
+ * Initializes THREE.js renderer, scene, camera, and lighting
+ * Sets up WebGL canvas overlay for rendering 3D objects
+ */
 function initThreeJS() {
 
     scene = new THREE.Scene();
     clock = new THREE.Clock();
 
     camera = new THREE.PerspectiveCamera(
-        70,
+        70, // 70° FOV
         window.innerWidth / window.innerHeight,
         1,
         1000
     );
 
-    console.log(camera);
-
     camera.position.set(0, 0, 0);
     camera.lookAt(0, 0, 30);
-    console.log('Camera position:', camera.position);
+    console.log('[info] Camera position:', camera.position);
 
     renderer = new THREE.WebGLRenderer({
         alpha: true,
@@ -265,15 +304,12 @@ function initThreeJS() {
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     audioListener = new THREE.AudioListener();
-    // camera.add(audioListener);
-
     audioLoader = new THREE.AudioLoader();
 
     /**
      * 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
-
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 10, -5);
     scene.add(directionalLight);
@@ -291,13 +327,15 @@ function initThreeJS() {
     scene.add(modelLight);
      */
 
-    console.log('Three.js initialized');
-
+    console.log('[info] Three.js initialized');
     launchFlags["Three"] = true;
 }
 
+/**
+ * Load 3D AR objects (platypus model) using GLTFLoader with DRACO compression
+ * Extracts animations,
+ */
 function loadARObjects() {
-    console.log('arObjectsConfig:', arObjectsConfig);
 
     const loader = new THREE.GLTFLoader();
 
@@ -313,9 +351,21 @@ function loadARObjects() {
                 const model = gltf.scene;
                 model.position.set(0, 10000, 50);
 
-                // config.scale ||
                 const modelScale = config.scale;
                 model.scale.set(modelScale.x, modelScale.y, modelScale.z);
+
+                model.traverse((child) => {
+                    if (child.isLight) {
+                        console.log("Found light in model:", child.type);
+                        child.visible = true;
+
+                        // if (child.intensity) { child.intensity *= 2; }
+                    }
+
+                    if (child.isMesh && child.material) {
+                        child.material.needsUpdate = true;
+                    }
+                });
 
                 scene.add(model);
                 arObjects.push(model);
@@ -346,16 +396,22 @@ function loadARObjects() {
     });
 }
 
+/**
+ * Load audio narration and setup subtitle tracks
+ * Creates VTT cues for timed subtitles and attaches event handlers
+ * Sets Audio launch flag to true when complete
+ */
 function loadModelAudio() {
-    // Function to update the subtitle box
+    /**
+     * Event handler to update subtitle display when a cue becomes active
+     * @param {*} event - Cue enter event containing subtitle text
+     */
     function subtitleChange(event) {
         document.getElementById("subtitle-container").textContent = event.target.text;
     }
-    // Load the audio file
-    console.log("Loading audio:", audioFileName);
-    audioPlayer = new Audio(audioPath + audioFileName);
+    //console.log("Loading audio:", audioFileName);
+    audioPlayer = new Audio("audio/NarrationAudio.mp3");
 
-    
     // Load the subtitles
     const track = audioPlayer.addTextTrack("subtitles");
     for (const [curveName, curveInfo] of Object.entries(sceneInformation)) {
@@ -374,6 +430,10 @@ function loadModelAudio() {
     attemptUnlock();
 }
 
+/**
+ * Handle window resize events
+ * Updates camera aspect ratio and renderer size to match new windows
+ */
 function onWindowResize() {
     if (camera && renderer) {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -385,6 +445,11 @@ function onWindowResize() {
 
 let previousPos = new THREE.Vector3(0, 0, 0);
 
+/**
+ * Main animation loop that runs every frame
+ * Updates model position along path, plays animations, manages scene state
+ * Called recursively via requestAnimationFrame
+ */
 function animate() {
     const deltaTime = clock.getDelta();
 
@@ -419,15 +484,12 @@ function animate() {
                 model.rotation.y = rotAngel;
 
                 /**
-                 * 
+                 * fallback for model positioning relative to marker
                 if (animTimer < curScene["CurveDuration"]) {
                     model.position.set(
                         previousPos.x*3+markerPositions[activePath].x*modelDistance*Math.tan(35 * (Math.PI / 180)),
                         previousPos.y*3+markerPositions[activePath].y*modelDistance*Math.tan(35 * (Math.PI / 180)),
                         previousPos.z*3-modelDistance
-                                                markerPos.x + previousPos.x * 0.3,
-                        markerPos.y + previousPos.y * 0.3,
-                        markerPos.z + previousPos.z * 0.3 - modelDistance
                     );
                 }
                  */
@@ -449,8 +511,8 @@ function animate() {
         if (animationMixer_2) {
             animationMixer_2.update(deltaTime);
 
-            if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 1][0]) {
-                const nextAnimIndex = curScene["Animations"][currentAnimation + 1][1];
+            if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 2][0]) {
+                const nextAnimIndex = curScene["Animations"][currentAnimation + 2][1];
 
                 if (currentAnimation >= 0) {
                     const curAnimIndex = curScene["Animations"][currentAnimation][1];
@@ -479,11 +541,7 @@ function animate() {
             lastMarker = -1;
         }
 
-        // console.log(elapsedTime);
-
         elapsedTime += deltaTime;
-        // document.getElementById("elapsed-time").textContent = elapsedTime;
-
     }
 
     renderer.render(scene, camera);
@@ -491,13 +549,16 @@ function animate() {
 }
 
 /**
- * Using pre-defined coordinates, generate a set of three.js Path objects
- * for the 3D model to follow.
+ * Generate a set of THREE.js Path objects from scene configuration
+ * Creates smooth curvers for the model to follow during each scene
+ * Supports linear and quadratic Bezier curves
+ * Sets path launch flag to true when complete
  */
 function generatePaths() {
     for (const [curveName, curveInfo] of Object.entries(sceneInformation)) {
         // Generate a curve
         const curPath = new THREE.Path();
+
         for (let i = 1; i < curveInfo["Curves"].length; i++) {
             switch(curveInfo["Curves"][i][0]) {
             // Form a straight line segment
@@ -520,13 +581,18 @@ function generatePaths() {
     }
 
     launchFlags["Paths"] = true;
-    console.log("<Finished loading: Paths>");
+    console.log("[info] Finished loading: Paths");
     attemptUnlock();
 }
 
-/** Unlock the start button once all assets are loaded. */
+/**
+ * Check if all assets are loaded and unlock the start button
+ * Called by each asset loader when it completes
+ * Enables the start button on index.html when all flags are true
+ * @returns - Exit condition if any flag is false
+ */
 function attemptUnlock() {
-    console.log("Attempting launch!");
+    //console.log("Attempting launch!");
     for (const key in launchFlags) {
         if (launchFlags.hasOwnProperty(key)) {
             console.log(launchFlags[key]);
@@ -542,7 +608,11 @@ function attemptUnlock() {
     }
 }
 
-// Runs once everything is setup and the start button is pressed
+/**
+ * Start the AR experience
+ * Called when a user presses the start button
+ * Begins animation loop and prepares audio playback
+ */
 function startFunction() {
     animate();
     audioPlayer.play();
@@ -550,17 +620,22 @@ function startFunction() {
     document.getElementById("welcome-div").style.visibility = "hidden";
 
     experienceStarted = true;
-
-    // activePath = 1;
-    // changeScene("Scene2");
 }
 
+/**
+ * Main initialization function
+ * Sets up all systems in order: A-Frame-AR.js camera, THREE.js, models, audio, paths
+ * Registers event listeners for UI controls and window resize
+ * 
+ * @async
+ * @returns - Exit condition if A-Frame system is not ready
+ */
 async function init() {
-    console.log('Initializing AR experience...');
+    console.log('[info] Initializing AR experience...');
 
     const arReady = await waitForARSystem();
     if (!arReady) {
-        console.error('Camera initalization failed');
+        console.error('[error] Camera initalization failed');
         return;
     }
     initThreeJS();
@@ -581,6 +656,9 @@ async function init() {
     window.addEventListener('resize', onWindowResize);
 }
 
+/**
+ * Start initialization when DOM is ready
+ */
 if (document.readyState == 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
