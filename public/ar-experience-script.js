@@ -779,6 +779,16 @@ async function init() {
     window.addEventListener('resize', onWindowResize);
 }
 
+function listAvailableAnimations() {
+    if (animationController) {
+        animationController.getAnimationNames.forEach((name, index) => {
+            console.log(`${index}:"${name}"`);
+        });
+    }
+}
+
+window.listAvailableAnimations = listAvailableAnimations;
+
 /**
  * Start initialization when DOM is ready
  */
