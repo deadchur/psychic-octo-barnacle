@@ -638,7 +638,7 @@ function animate() {
         if (animationController) {
             animationController.update(deltaTime);
 
-            const nextAnimationIndex = currentAnimation + 1;
+            const nextAnimationIndex = currentAnimationIndex + 1;
 
             if (nextAnimationIndex > curScene["Animations"].length) {
                 const nextAnimation = curScene["Animations"][nextAnimationIndex];
