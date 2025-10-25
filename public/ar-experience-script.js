@@ -1,4 +1,3 @@
-
 let camera, clock, renderer, scene, video;
 let audioListener, audioLoader;
 let arObjects = [];
@@ -146,8 +145,8 @@ class AnimationController {
             this.actionMap.set(clip.name, action);
         });
 
-        console.log('AnimationController initialized with animations:',
-            Array.from(this.actionMap.keys()).join(','));
+        console.log('[info] AnimationController initialized with animations:',
+            Array.from(this.actionMap.keys()).join(',\n'));
     }
 
     /**
@@ -456,10 +455,10 @@ function loadARObjects() {
 
                 model.traverse((child) => {
                     if (child.isLight) {
-                        console.log("Found light in model:", child.type);
+                        //console.log("[info] Found light in model:", child.type);
                         child.visible = true;
 
-                        // if (child.intensity) { child.intensity *= 2; }
+                        if (child.intensity) { child.intensity /= 2; }
                     }
 
                     if (child.isMesh && child.material) {
@@ -476,9 +475,12 @@ function loadARObjects() {
 
                     animationController = new AnimationController(mixer, gltf.animations);
 
+                    /**
+                     * 
                     animationController.getAnimationNames().forEach((name, i) => {
                         console.log(`${i}: "${name}"`);
                     });
+                    */
                 } else {
                     console.warn(["[waring] No animations found"])
                 }
@@ -608,32 +610,6 @@ function animate() {
                 animTimer += deltaTime / curScene["CurveDuration"];
             }
         }
-
-        /**
-         * 
-        if (animationMixer_2) {
-            animationMixer_2.update(deltaTime);
-
-            if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 1][0]) {
-
-                const nextAnimIndex = curScene["Animations"][currentAnimation + 1][1];
-
-                if (currentAnimation >= 0) {
-                    const curAnimIndex = curScene["Animations"][currentAnimation][0];
-                    if (pathwayAnimations[curAnimIndex]) {
-                        pathwayAnimations[curAnimIndex].stop();
-                    }
-                }
-
-                if (pathwayAnimations[nextAnimIndex]) {
-                    pathwayAnimations[nextAnimIndex].reset().play();
-                    console.log("Playing animation:", nextAnimIndex);
-                }
-
-                currentAnimation += 1;
-            }
-        }
-         */
 
         if (animationController) {
             animationController.update(deltaTime);
