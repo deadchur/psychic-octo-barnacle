@@ -166,7 +166,7 @@ html, body {
 .ar-button {
     width: 250px;
     height: 80px;
-    background: white;
+    background: red;
     border: none;
     border-radius: 12px;
     display: flex;

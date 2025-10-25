@@ -10,15 +10,16 @@ let audioSubtitles = [];
 let pathways = [];
 
 let audioPlayer = null;
+let animationController = null;
 
 let activePath = 0;
 let animTimer = 0;
 let elapsedTime = 0;
-let currentAnimation = -1;
+let currentAnimationIndex = -1;
 let currentSceneName = "";
 let experienceStarted = false;
 
-let modelDistance = 6;
+let modelDistance = 8;
 let modelScale = 5;
 
 let windowSize = [window.innerWidth, window.innerHeight];
@@ -43,6 +44,11 @@ const C_ORIGIN = 0;
 const C_LINEAR = 1;
 const C_QUADRATIC = 2;
 
+/**
+ * Scene configuration with named animations
+ * Each animation entry specifies the time it should start and its name
+ * @type {Object<string, {AudioStart: number, AudioEnd: number, Curves: Array, Subtitles: Array, Animations: Array, CurveDuration: number, SceneDuration: number}>}
+ */
 const sceneInformation = {
     "Scene1": {
         "AudioStart": 0,
@@ -61,8 +67,7 @@ const sceneInformation = {
             [13.5, 17, "especially as they are mainly active at night."]
         ],
         "Animations": [
-            [0, 6],
-            [99999999, 0]
+            { time: 0, name: "swim_A2"}
         ],
         "CurveDuration": 17,
         "SceneDuration": 17
@@ -89,12 +94,117 @@ const sceneInformation = {
             [35, 38, "while their back feet and tail act as rudders."]
         ],
         "Animations": [
-            [0, 6],
-            [99999999, 0]
+            { time: 0, name: "swim_A2"}
         ],
         "CurveDuration": 20,
         "SceneDuration": 20
     }
+}
+
+/**
+ * AnimationController for name-based lookup and state management
+ * 
+ * @class AnimationController
+ */
+class AnimationController {
+    /**
+     * Create an AnimationController
+     * @param {THREE.AnimationMixer} - THREE.js animation mixer
+     * @param {Array<THREE.AnimationClip>} - Array of animation clips from GLTF
+     */
+    constructor(mixer, animations) {
+        this.mixer = mixer;
+        this.currentAnimation = null;
+
+        this.actionMap = new Map();
+
+        animations.forEach(clip => {
+            const action = mixer.clipAction(clip);
+            action.setLoop(THREE.LoopRepeat);
+            this.actionMap.set(clipname, action);
+        });
+
+        console.log('AnimationController initialized with animations:',
+            Array.from(this.actionMap.keys()).join(','));
+    }
+
+    /**
+     * Check if animation exists by name
+     * @param {string} - Name of animation
+     * @returns {boolean} - If animation exists
+     */
+    hasAnimation(name) {
+        return this.actionMap.has(name);
+    }
+
+    /**
+     * Get all available animation names
+     * @returns {Array<string>} - Array of animation names
+     */
+    getAnimationNames() {
+        return Array.from(this.actionMap.keys());
+    }
+
+    /**
+     * Play animation by name with option fade transition
+     * @param {*} name - Name of animation to play
+     * @param {*} fadeTime - Duration of fade transition in seconds
+     * @returns {boolean} true if animation was found, otherwise false
+     */
+    playAnimationByName(name, fadeTime = 0.5) {
+        const nextAction = this.actionMap.get(name);
+
+        if (!nextAction) {
+            console.warn(`[warning] Animation "${name}" not found. Available animations:`,
+                this.getAnimationNames().join(','));
+            return false;
+        }
+
+        if (this.currentAction === nextAction && nextAction.isRunning()) {
+            return true;
+        }
+
+        if (this.currentAction && this.currentAction !== nextAction) {
+            this.currentAction.fadeOut(fadeTime);
+        }
+
+        nextAction.reset().fadeIn(fadeTime).play();
+        this.currentAction = nextAction;
+
+        return true;
+    }
+
+    /**
+     * Get the name of currently playing animation
+     * @returns {string|null} - Name of current animation, otherwise null
+     */
+    getAnimationName() {
+        if  (!this.currentAction) return null;
+
+        for (const [name, action] of this.actionMap.entries()) {
+            if (action === this.currentAction) {
+                return name;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Stop all playing animations
+     */
+    stopAll() {
+        this.actionMap.forEach(action => action.stop());
+        this.currentAction = null;
+    }
+
+    /**
+     * Update the animation mixer (every frame)
+     * @param {*} deltaTime - Time since last frame in seconds
+     */
+    update(deltaTime) {
+        this.mixer.update(deltaTime)
+    }
+
 }
 
 // store visibility data in object;
@@ -209,10 +319,15 @@ function changeScene(sceneId) {
         audioPlayer.pause();
         audioPlayer.currentTime = sceneInformation[sceneId]["AudioStart"];
         audioPlayer.play();
+
         currentSceneName = sceneId;
         animTimer = 0;
         elapsedTime = 0;
-        currentAnimation = -1;
+        currentAnimationIndex = -1;
+
+        if (animationController) {
+            animationController.stopAll();
+        }
 
         if (document.getElementById("subtitle-choice").checked) {
             document.getElementById("subtitle-div").style.visibility = "visible";
@@ -241,20 +356,6 @@ async function waitForARSystem() {
                 arScene.addEventListener('loaded', resolve, { once: true });
             });
         }
-
-        /**
-         * 
-        const arSource = window.THREEx?.ArToolkitSource?.instance;
-        if (arSource && arSource.parameters) {
-            arSource.parameters.sourceWidth = 1920;
-            arSource.parameters.sourceHeight = 1080;
-            arSource.parameters.displayWidth = 1920;
-            arSource.parameters.displayHeight = 1080;
-            console.log('[info] JS override 1080p video source');
-        } else {
-            console.warn('[warning] ARToolkitSource instance not ready - cannot set resolution');
-        }
-         */
 
         launchFlags["Camera"] = true;
         return true;
@@ -496,9 +597,9 @@ function animate() {
                     const markerPos = markerPositions[activePath];
 
                     model.position.set(
-                        markerPos.x + previousPos.x * 0.2,
-                        markerPos.y + previousPos.y * 0.2,
-                        markerPos.z + previousPos.z * 0.2 - modelDistance
+                        markerPos.x + previousPos.x * 0.4,
+                        markerPos.y + previousPos.y * 0.4,
+                        markerPos.z + previousPos.z * 0.4 - modelDistance
                     )
                 }
                 
@@ -506,14 +607,17 @@ function animate() {
             }
         }
 
+        /**
+         * 
         if (animationMixer_2) {
             animationMixer_2.update(deltaTime);
 
             if (currentAnimation < curScene["Animations"].length - 1 && elapsedTime > curScene["Animations"][currentAnimation + 1][0]) {
-                const nextAnimIndex = curScene["Animations"][currentAnimation + 1][2];
+
+                const nextAnimIndex = curScene["Animations"][currentAnimation + 1][1];
 
                 if (currentAnimation >= 0) {
-                    const curAnimIndex = curScene["Animations"][currentAnimation][2];
+                    const curAnimIndex = curScene["Animations"][currentAnimation][0];
                     if (pathwayAnimations[curAnimIndex]) {
                         pathwayAnimations[curAnimIndex].stop();
                     }
@@ -525,6 +629,27 @@ function animate() {
                 }
 
                 currentAnimation += 1;
+            }
+        }
+         */
+
+        if (animationController) {
+            animationController.update(deltaTime);
+
+            const nextAnimationIndex = currentAnimation + 1;
+
+            if (nextAnimationIndex > curScene["Animations"].length) {
+                const nextAnimation = curScene["Animations"][nextAnimationIndex];
+
+                if (elapsedTime >= nextAnimation.time) {
+                    const success = animationController.playAnimationByName(nextAnimation.name, 0.5);
+
+                    if (success) {
+                        currentAnimationIndex = nextAnimationIndex;
+                    } else {
+                        currentAnimationIndex = nextAnimationIndex
+                    }
+                }
             }
         }
 
