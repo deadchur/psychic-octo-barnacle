@@ -79,10 +79,8 @@ html, body {
     right:0%;
     top:0%;
     bottom:0%;
-
     background-color: #011d33;
     color: white;
-
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -133,27 +131,6 @@ html, body {
     font-size: 20px;
 }
 
-.back-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 25px;
-    font-size: 16px;
-    cursor: pointer;
-    z-index: 9;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.3s ease;
-}
-.back-button-hover {
-
-    background: rgba(0, 0, 0, 0.9);
-}
-
 .content-container {
     flex: 1;
     display: flex;
@@ -163,42 +140,9 @@ html, body {
     padding: 30px;
 }
 
-.ar-button {
-    width: 250px;
-    height: 80px;
-    background: red;
-    border: none;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    text-decoration: none;
-    margin-bottom: 40px;
-    color: #002A3A;
-    font-size: 18px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ar-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
-
-.ar-button:active {
-    transform: scaleY(0px);
-}
-
 #subtitle-box {
     position: absolute;
     z-index:3;
-    /* border:solid 2px red; */
-    /* width:10%; */
-    /* height:10%; */
     left:3%;
     top:2%;
     display:flex;
@@ -208,6 +152,5 @@ html, body {
 
 #subtitle-box > label {
     color:white;
-    /* background: gray; */
     padding: 0.5em;
 }

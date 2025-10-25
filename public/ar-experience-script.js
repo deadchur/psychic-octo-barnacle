@@ -2,9 +2,7 @@
 let camera, clock, renderer, scene, video;
 let audioListener, audioLoader;
 let arObjects = [];
-let mixers = []
 
-let pathwayAnimations = [];
 let animationMixer_2 = null;
 let audioSubtitles = [];
 let pathways = [];
@@ -391,6 +389,8 @@ function initThreeJS() {
         powerPreference: "high-performance"
     });
 
+    renderer.physicallyCorrectLights = true;
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
@@ -474,24 +474,26 @@ function loadARObjects() {
                     const mixer = new THREE.AnimationMixer(model);
                     animationMixer_2 = mixer;
 
-                    for (let i = 0; i < gltf.animations.length; i++) {
-                        const action = mixer.clipAction(gltf.animations[i]);
-                        action.setLoop(THREE.LoopRepeat)
-                        pathwayAnimations.push(action);
-                    }
-                }
+                    animationController = new AnimationController(mixer, gltf.animations);
 
-                if (gltf.animations && gltf.animations.length > 0) {
-                    const mixer = new THREE.AnimationMixer(model);
-
-                    model.animationActions = [];
-                    mixers.push(mixer);
+                    animationController.getAnimationNames().forEach((name, i) => {
+                        console.log(`${i}: "${name}"`);
+                    });
+                } else {
+                    console.warn(["[waring] No animations found"])
                 }
 
                 launchFlags["Model"] = true;
                 console.log("[info] Finished loading: Model");
                 attemptUnlock();
             },
+            (xhr) => {
+                const percentComplete = (xhr.loader / xhr.total * 100).toFixed(0);
+                //console.log(`Model loading: ${percentComplete}%`);
+            },
+            (error) => {
+                console.error('[error] Error loading model:', error);
+            }
         );
     });
 }
